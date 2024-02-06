@@ -1,0 +1,13 @@
+qemu-system-x86_64 \
+ -smp 1 \
+ -m 2048 \
+ -machine q35 \
+ -global ICH9-LPC.disable_s3=1 \
+ -net nic,model=virtio \
+ -net user,hostfwd=tcp::8022-:22,hostfwd=tcp::8090-:80  \
+ -drive file=OVMF_CODE.secboot.fd,if=pflash,format=raw,unit=0,readonly=on \
+ -drive file=OVMF_VARS.ms.fd,if=pflash,format=raw,unit=1 \
+ -drive "file=ubuntu-core-22-amd64.img",if=none,format=raw,id=disk1 \
+ -device virtio-blk-pci,drive=disk1,bootindex=1 \
+ -nographic \
+ -serial mon:stdio
