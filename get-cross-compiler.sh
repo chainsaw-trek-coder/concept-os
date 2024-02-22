@@ -1,8 +1,12 @@
+# Install required packages.
+sudo apt update -y
 sudo apt install flex -y
 sudo apt install libgmp3-dev -y
 sudo apt install libmpc-dev -y
 sudo apt install libmpfr-dev -y
 sudo apt install texinfo -y
+
+# Install binutils
 pushd /tmp
 
 export PREFIX="$HOME/opt/cross"
@@ -18,7 +22,11 @@ cd build-binutils
 make
 make install
 
-# GCC
+popd
+
+# Install GCC
+pushd /tmp
+
 wget https://ftp.gnu.org/gnu/gcc/gcc-9.4.0/gcc-9.4.0.tar.gz
 tar xvf gcc-9.4.0.tar.gz
 
