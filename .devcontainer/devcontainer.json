@@ -4,6 +4,7 @@
 	"name": "Ubuntu",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"postCreateCommand": "/workspaces/concept-os/.devcontainer/initialize.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [
