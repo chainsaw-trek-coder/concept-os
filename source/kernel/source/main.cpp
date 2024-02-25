@@ -10,7 +10,7 @@
 
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
+#error "i386 is the only thing supported."
 #endif
 
 #if defined(__i386__)
@@ -22,6 +22,7 @@
 #endif
 
 #include "terminal.h"
+#include "memory/memory.h"
 
 // Doesn't work in protected mode...
 // void get_physical_memory(short *low_mem, short *high_mem)
@@ -41,6 +42,51 @@
 // 	*high_mem = b;
 // }
 
+void print_mem_entry(multiboot_memory_map_t &mem_entry)
+{
+	char string_buffer[11];
+
+#if defined(__i386__)
+	terminal_writestring("Start Addr: ");
+	int_to_hex_string(mem_entry.addr_high, string_buffer);
+	terminal_writestring(string_buffer);
+	terminal_writestring(" ");
+	int_to_hex_string(mem_entry.addr_low, string_buffer);
+	terminal_writestring(string_buffer);
+
+	terminal_writestring(" | Length: ");
+	int_to_hex_string(mem_entry.len_high, string_buffer);
+	terminal_writestring(string_buffer);
+	terminal_writestring(" ");
+	int_to_hex_string(mem_entry.len_low, string_buffer);
+	terminal_writestring(string_buffer);
+
+	terminal_writestring(" | Size: ");
+	int_to_hex_string(mem_entry.size, string_buffer);
+	terminal_writestring(string_buffer);
+
+	terminal_writestring(" | Type: ");
+	int_to_string(mem_entry.type, string_buffer);
+	terminal_writestring(string_buffer);
+	terminal_writestring("\n");
+#else
+#error "Printing memory entries for architectures other than i386 not yet supported."
+#endif
+}
+
+void set_global_memory(multiboot_memory_map_t &mem_entry)
+{
+#if defined(__i386__)
+	if (global_mem_size < mem_entry.len_low)
+	{
+		global_mem_start = reinterpret_cast<void*>(mem_entry.addr_low);
+		global_mem_size = mem_entry.len_low;
+	}
+#else
+#error "Setting global memory for architectures other than i386 not yet supported."
+#endif
+}
+
 extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 {
 	/* Initialize terminal interface */
@@ -50,9 +96,8 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 	{
 		terminal_writestring("Multiboot information valid.\n\n");
 
-		auto mem_table = (multiboot_memory_map_t*)(mbd->mmap_addr);
-
-		char string_buffer[11];
+		// Select main memory segment.
+		auto mem_table = (multiboot_memory_map_t *)(mbd->mmap_addr);		
 
 		for (multiboot_uint32_t i = 0; i < mbd->mmap_length && i < 10; i++)
 		{
@@ -60,30 +105,26 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 
 			if (mem_entry.type > 0)
 			{
-				terminal_writestring("Start Addr: ");
-				int_to_hex_string(mem_entry.addr_high, string_buffer);
-				terminal_writestring(string_buffer);
-				terminal_writestring(" ");
-				int_to_hex_string(mem_entry.addr_low, string_buffer);
-				terminal_writestring(string_buffer);
+				print_mem_entry(mem_entry);
+			}
 
-				terminal_writestring(" | Length: ");
-				int_to_hex_string(mem_entry.len_high, string_buffer);
-				terminal_writestring(string_buffer);
-				terminal_writestring(" ");
-				int_to_hex_string(mem_entry.len_low, string_buffer);
-				terminal_writestring(string_buffer);
-
-				terminal_writestring(" | Size: ");
-				int_to_hex_string(mem_entry.size, string_buffer);
-				terminal_writestring(string_buffer);
-
-				terminal_writestring(" | Type: ");
-				int_to_string(mem_entry.type, string_buffer);
-				terminal_writestring(string_buffer);
-				terminal_writestring("\n");
+			if (mem_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
+			{
+				set_global_memory(mem_entry);
 			}
 		}
+
+		char string_buffer[11];
+		terminal_writestring("\n\n");
+		terminal_writestring("Selected global address: ");
+		ptr_to_hex_string(global_mem_start, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Selected global size: ");
+		int_to_string(global_mem_size, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring(" bytes\n");
 	}
 	else
 	{

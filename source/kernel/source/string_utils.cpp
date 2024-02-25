@@ -54,3 +54,12 @@ void int_to_hex_string(unsigned value, char *str)
 
     str[10] = 0;
 }
+
+void ptr_to_hex_string(void* value, char *str)
+{
+    #if defined(__i386__)
+    int_to_hex_string(reinterpret_cast<unsigned>(value), str);
+    #else
+    #error Converting pointers to their string representation only supported on i386.
+    #endif
+}

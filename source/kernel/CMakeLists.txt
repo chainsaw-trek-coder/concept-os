@@ -18,7 +18,7 @@ ENABLE_LANGUAGE(ASM-ATT)
 
 configure_file(linker.ld ./ COPYONLY)
 
-FILE(GLOB C_SRCS source/**.cpp)
+FILE(GLOB C_SRCS source/*.cpp source/**/*.cpp)
 
 include_directories("include")
 ADD_EXECUTABLE(kernel ${C_SRCS} source/x86_32/boot.s)
