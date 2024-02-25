@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "multiboot.h"
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -11,6 +10,14 @@
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
+#endif
+
+#if defined(__i386__)
+	#include "x86_32/multiboot.h"
+#endif
+
+#if defined(__x86_64__)
+	#include "x86_64/multiboot.h"
 #endif
 
 /* Hardware text mode color constants. */
