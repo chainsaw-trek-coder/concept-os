@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "string_utils.h"
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -14,6 +15,8 @@
 
 #if defined(__i386__)
 	#include "x86_32/multiboot.h"
+	// HACK
+	#undef __x86_64__
 #endif
 
 #if defined(__x86_64__)
@@ -145,30 +148,6 @@ void get_physical_memory(short *low_mem, short *high_mem)
 	*high_mem = b;
 }
 
-void convert_to_string(unsigned value, char *str)
-{
-	char *cur_conv = str + 9;
-
-	do
-	{
-		// Convert current digit to character and store it.
-		*cur_conv = 48 + (value % 10);
-		cur_conv--;
-	} while ((value /= 10) > 0);
-
-	cur_conv++;
-
-	// Left-align string.
-	char *cur_align = str;
-	while (cur_conv <= str + 9)
-	{
-		*cur_align = *cur_conv;
-		cur_align++;
-		cur_conv++;
-	}
-
-	*cur_align = 0;
-}
 
 extern "C" void kernel_main(multiboot_info_t* mbd, uint32_t magic)
 {
@@ -180,21 +159,36 @@ extern "C" void kernel_main(multiboot_info_t* mbd, uint32_t magic)
 	else
 		terminal_writestring("Multiboot information is not valid.");
 
-	// short low_mem = 1, high_mem_pages = 1;
-	// get_physical_memory(&low_mem, &high_mem_pages);
+	auto mem_table = (multiboot_memory_map_t*)(mbd->mmap_addr);
 
-	// unsigned high_mem = high_mem_pages * 65536;
+	char string_buffer[11];
 
-	// char low_mem_string[11];
-	// char high_mem_string[11];
-	// convert_to_string(low_mem, low_mem_string);
-	// convert_to_string(high_mem, high_mem_string);
+	for(int i = 0; i < mbd->mmap_length && i < 5; i++)
+	{
 
-	// terminal_writestring("Low memory: ");
-	// terminal_writestring(low_mem_string);
-	// terminal_writestring("\n");
+		auto& mem_entry = mem_table[i];
 
-	// terminal_writestring("High memory: ");
-	// terminal_writestring(high_mem_string);
-	// terminal_writestring("\n");
+		terminal_writestring("Start Addr: ");
+		int_to_hex_string(mem_entry.addr_high, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring(" ");
+		int_to_hex_string(mem_entry.addr_low, string_buffer);
+		terminal_writestring(string_buffer);
+
+		terminal_writestring(" | Length: ");
+		int_to_hex_string(mem_entry.len_high, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring(" ");
+		int_to_hex_string(mem_entry.len_low, string_buffer);
+		terminal_writestring(string_buffer);
+
+		terminal_writestring(" | Size: ");
+		int_to_hex_string(mem_entry.size, string_buffer);
+		terminal_writestring(string_buffer);
+		
+		terminal_writestring(" | Type: ");
+		int_to_string(mem_entry.type, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+	}
 }

@@ -3,5 +3,8 @@
     "C_Cpp.default.includePath": [
         "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
     ],
+    "C_Cpp.default.defines": [
+        "__i386__"
+    ],
     "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel"
 }
