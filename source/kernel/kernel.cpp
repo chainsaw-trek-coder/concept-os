@@ -14,13 +14,13 @@
 #endif
 
 #if defined(__i386__)
-	#include "x86_32/multiboot.h"
-	// HACK
-	#undef __x86_64__
+#include "x86_32/multiboot.h"
+// HACK
+#undef __x86_64__
 #endif
 
 #if defined(__x86_64__)
-	#include "x86_64/multiboot.h"
+#include "x86_64/multiboot.h"
 #endif
 
 /* Hardware text mode color constants. */
@@ -141,54 +141,58 @@ void get_physical_memory(short *low_mem, short *high_mem)
 		"int $0x15\n\t"
 		"movw %%ax, %[low]\n\t"
 		"movw %%bx, %[high]\n\t"
-		: [low] "=r" (a), [high] "=r" (b)
-	);
+		: [low] "=r"(a), [high] "=r"(b));
 
 	*low_mem = a;
 	*high_mem = b;
 }
 
-
-extern "C" void kernel_main(multiboot_info_t* mbd, uint32_t magic)
+extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	if(magic == MULTIBOOT_BOOTLOADER_MAGIC)
-		terminal_writestring("Multiboot information valid.");
-	else
-		terminal_writestring("Multiboot information is not valid.");
-
-	auto mem_table = (multiboot_memory_map_t*)(mbd->mmap_addr);
-
-	char string_buffer[11];
-
-	for(int i = 0; i < mbd->mmap_length && i < 5; i++)
+	if (magic == MULTIBOOT_BOOTLOADER_MAGIC)
 	{
+		terminal_writestring("Multiboot information valid.\n\n");
 
-		auto& mem_entry = mem_table[i];
+		auto mem_table = (multiboot_memory_map_t *)(mbd->mmap_addr);
 
-		terminal_writestring("Start Addr: ");
-		int_to_hex_string(mem_entry.addr_high, string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring(" ");
-		int_to_hex_string(mem_entry.addr_low, string_buffer);
-		terminal_writestring(string_buffer);
+		char string_buffer[11];
 
-		terminal_writestring(" | Length: ");
-		int_to_hex_string(mem_entry.len_high, string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring(" ");
-		int_to_hex_string(mem_entry.len_low, string_buffer);
-		terminal_writestring(string_buffer);
+		for (int i = 0; i < mbd->mmap_length && i < 10; i++)
+		{
+			auto &mem_entry = mem_table[i];
 
-		terminal_writestring(" | Size: ");
-		int_to_hex_string(mem_entry.size, string_buffer);
-		terminal_writestring(string_buffer);
-		
-		terminal_writestring(" | Type: ");
-		int_to_string(mem_entry.type, string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
+			if (mem_entry.type > 0)
+			{
+				terminal_writestring("Start Addr: ");
+				int_to_hex_string(mem_entry.addr_high, string_buffer);
+				terminal_writestring(string_buffer);
+				terminal_writestring(" ");
+				int_to_hex_string(mem_entry.addr_low, string_buffer);
+				terminal_writestring(string_buffer);
+
+				terminal_writestring(" | Length: ");
+				int_to_hex_string(mem_entry.len_high, string_buffer);
+				terminal_writestring(string_buffer);
+				terminal_writestring(" ");
+				int_to_hex_string(mem_entry.len_low, string_buffer);
+				terminal_writestring(string_buffer);
+
+				terminal_writestring(" | Size: ");
+				int_to_hex_string(mem_entry.size, string_buffer);
+				terminal_writestring(string_buffer);
+
+				terminal_writestring(" | Type: ");
+				int_to_string(mem_entry.type, string_buffer);
+				terminal_writestring(string_buffer);
+				terminal_writestring("\n");
+			}
+		}
+	}
+	else
+	{
+		terminal_writestring("Multiboot information is not valid.\n");
 	}
 }
