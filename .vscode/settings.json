@@ -6,5 +6,6 @@
     "C_Cpp.default.defines": [
         "__i386__"
     ],
+    "C_Cpp.default.intelliSenseMode": "gcc-x86",
     "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel"
 }

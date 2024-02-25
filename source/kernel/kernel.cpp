@@ -15,8 +15,6 @@
 
 #if defined(__i386__)
 #include "x86_32/multiboot.h"
-// HACK
-#undef __x86_64__
 #endif
 
 #if defined(__x86_64__)
@@ -52,7 +50,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 	{
 		terminal_writestring("Multiboot information valid.\n\n");
 
-		auto mem_table = (multiboot_memory_map_t *)(mbd->mmap_addr);
+		auto mem_table = (multiboot_memory_map_t*)(mbd->mmap_addr);
 
 		char string_buffer[11];
 
