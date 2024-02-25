@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "multiboot.h"
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -121,32 +122,38 @@ void terminal_writestring(const char *data)
 
 void get_physical_memory(short *low_mem, short *high_mem)
 {
-	asm inline(
-		"XOR %CX, %CX\n\t"
-		"XOR %DX, %DX\n\t"
-		"MOV %AX, 0xE801\n\t"
-		"INT $0x15\n\t"
-		"MOV %AX, %0\n\t"
-		"MOV %BX, %1"
-		: "=r"(low_mem), "=r"(high_mem));
+	short a = 0, b = 0;
+
+	asm volatile(
+		"xor %%ecx, %%ecx\n\t"
+		"xor %%edx, %%edx\n\t"
+		"movw $0xE801, %%eax\n\t"
+		"int $0x15\n\t"
+		"movw %%ax, %[low]\n\t"
+		"movw %%bx, %[high]\n\t"
+		: [low] "=r" (a), [high] "=r" (b)
+	);
+
+	*low_mem = a;
+	*high_mem = b;
 }
 
-void convert_to_string(unsigned value, char* str)
+void convert_to_string(unsigned value, char *str)
 {
-	char* cur_conv = str + 9;
+	char *cur_conv = str + 9;
 
 	do
 	{
 		// Convert current digit to character and store it.
 		*cur_conv = 48 + (value % 10);
 		cur_conv--;
-	} while((value /= 10) > 0);
+	} while ((value /= 10) > 0);
 
 	cur_conv++;
 
 	// Left-align string.
-	char* cur_align = str;
-	while(cur_conv <= str + 9)
+	char *cur_align = str;
+	while (cur_conv <= str + 9)
 	{
 		*cur_align = *cur_conv;
 		cur_align++;
@@ -156,19 +163,31 @@ void convert_to_string(unsigned value, char* str)
 	*cur_align = 0;
 }
 
-extern "C" void kernel_main(void)
+extern "C" void kernel_main(multiboot_info_t* mbd, uint32_t magic)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	/* Newline support is left as an exercise. */
-	terminal_writestring("Hello, kernel World!\n");
-	terminal_writestring("Test line 2.\n");
+	if(magic == MULTIBOOT_BOOTLOADER_MAGIC)
+		terminal_writestring("Multiboot information valid.");
+	else
+		terminal_writestring("Multiboot information is not valid.");
 
-	int n = 15;
-	char number_string[11];
-	convert_to_string(n, number_string);
+	// short low_mem = 1, high_mem_pages = 1;
+	// get_physical_memory(&low_mem, &high_mem_pages);
 
-	terminal_writestring("Test convert to string: ");
-	terminal_writestring(number_string);
+	// unsigned high_mem = high_mem_pages * 65536;
+
+	// char low_mem_string[11];
+	// char high_mem_string[11];
+	// convert_to_string(low_mem, low_mem_string);
+	// convert_to_string(high_mem, high_mem_string);
+
+	// terminal_writestring("Low memory: ");
+	// terminal_writestring(low_mem_string);
+	// terminal_writestring("\n");
+
+	// terminal_writestring("High memory: ");
+	// terminal_writestring(high_mem_string);
+	// terminal_writestring("\n");
 }
