@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
+project(kernel)
+
 set(CMAKE_ASM-ATT_COMPILER /home/vscode/opt/cross/bin/i686-elf-as)
 set(CMAKE_C_COMPILER   /home/vscode/opt/cross/bin/i686-elf-gcc)
 set(CMAKE_CXX_COMPILER /home/vscode/opt/cross/bin/i686-elf-g++)
@@ -16,7 +18,9 @@ ENABLE_LANGUAGE(ASM-ATT)
 
 configure_file(linker.ld ./ COPYONLY)
 
-FILE(GLOB C_SRCS *.cpp)
-ADD_EXECUTABLE(kernel ${C_SRCS} x86_32/boot.s)
+FILE(GLOB C_SRCS source/**.cpp)
+
+include_directories("include")
+ADD_EXECUTABLE(kernel ${C_SRCS} source/x86_32/boot.s)
 
 SET_TARGET_PROPERTIES(kernel PROPERTIES LINK_FLAGS "-T linker.ld -ffreestanding -O2 -nostdlib")

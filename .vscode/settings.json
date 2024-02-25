@@ -1,11 +1,3 @@
 {
-    "C_Cpp.errorSquiggles": "disabled",
-    "C_Cpp.default.includePath": [
-        "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
-    ],
-    "C_Cpp.default.defines": [
-        "__i386__"
-    ],
-    "C_Cpp.default.intelliSenseMode": "gcc-x86",
     "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel"
 }

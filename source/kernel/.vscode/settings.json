@@ -1,0 +1,8 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/../../build"
+}
