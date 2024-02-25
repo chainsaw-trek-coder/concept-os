@@ -54,7 +54,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 
 		char string_buffer[11];
 
-		for (int i = 0; i < mbd->mmap_length && i < 10; i++)
+		for (multiboot_uint32_t i = 0; i < mbd->mmap_length && i < 10; i++)
 		{
 			auto &mem_entry = mem_table[i];
 

@@ -35,7 +35,7 @@ void int_to_string(unsigned value, char *str)
 
 char nibble_to_hex(unsigned char nibble)
 {
-    if (nibble >= 0 && nibble <= 9)
+    if (nibble <= 9)
         return 48 + nibble; // 48 = '0'
     else
         return 65 + (nibble - 10); // 41 = 'A'

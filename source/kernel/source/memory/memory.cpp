@@ -1,0 +1,1 @@
+void* global_mem_start = nullptr;
