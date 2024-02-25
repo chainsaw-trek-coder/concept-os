@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
 set(CMAKE_ASM-ATT_COMPILER /home/vscode/opt/cross/bin/i686-elf-as)
 set(CMAKE_C_COMPILER   /home/vscode/opt/cross/bin/i686-elf-gcc)
