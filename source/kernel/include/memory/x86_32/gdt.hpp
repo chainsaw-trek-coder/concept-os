@@ -75,7 +75,18 @@ struct segment_descriptor
     void set_is_system(bool is_system); // When set indicates system segment, otherwise code or data.
 };
 
+template <int array_size>
 struct global_descriptor_table
 {
-    segment_descriptor reserved; // Null descriptor is never used.
+    segment_descriptor null_segment; // Null descriptor is never used.
+    segment_descriptor segments[array_size];
+};
+
+struct flat_global_descriptor_table
+{
+    segment_descriptor null_segment; // Null descriptor is never used.
+    segment_descriptor code_segment;
+    segment_descriptor data_segment;
+
+    flat_global_descriptor_table(void* base, size_t size_in_bytes);
 };
