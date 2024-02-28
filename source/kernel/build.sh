@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p ../../build/kernel
-cmake . -B ../../build/kernel
+cmake ./source -B ../../build/kernel
 
 pushd ../../build/kernel
 make

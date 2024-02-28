@@ -18,9 +18,9 @@ ENABLE_LANGUAGE(ASM-ATT)
 
 configure_file(linker.ld ./ COPYONLY)
 
-FILE(GLOB C_SRCS source/*.cpp source/**/*.cpp source/memory/*/*.cpp)
+FILE(GLOB C_SRCS *.cpp **/*.cpp memory/*/*.cpp)
 
-include_directories("include")
-ADD_EXECUTABLE(kernel ${C_SRCS} source/x86_32/boot.s)
+include_directories("../include")
+ADD_EXECUTABLE(kernel ${C_SRCS} x86_32/boot.s)
 
 SET_TARGET_PROPERTIES(kernel PROPERTIES LINK_FLAGS "-T linker.ld -ffreestanding -O2 -nostdlib")
