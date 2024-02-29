@@ -11,6 +11,10 @@
         {
             "name": "build",
             "path": "./build"
+        },
+        {
+            "name": "Container Configuration",
+            "path": ".devcontainer"
         }
     ],
     "settings": {
