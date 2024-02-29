@@ -1,12 +1,16 @@
 {
     "folders": [
-        {
-            "name": "root",
-            "path": "."
-        },
+        // {
+        //     "name": "root",
+        //     "path": "."
+        // },
         {
             "name": "kernel",
             "path": "./source/kernel"
+        },
+        {
+            "name": "build",
+            "path": "./build"
         }
     ],
     "settings": {

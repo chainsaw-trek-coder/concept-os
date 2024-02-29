@@ -3,6 +3,10 @@
         "${workspaceFolder}/include",
         "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.buildDirectory": "${workspaceFolder}/../../build"
+    "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel",
+    "cmake.buildDirectory": "${workspaceFolder}/../../build/kernel",
+    "cmake.configureSettings": {
+        "CMAKE_C_COMPILER_WORKS": "1",
+        "CMAKE_CXX_COMPILER_WORKS": "1"
+    }
 }
