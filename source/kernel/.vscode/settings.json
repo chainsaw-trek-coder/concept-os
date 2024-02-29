@@ -8,5 +8,6 @@
     "cmake.configureSettings": {
         "CMAKE_C_COMPILER_WORKS": "1",
         "CMAKE_CXX_COMPILER_WORKS": "1"
-    }
+    },
+    "cmake.ignoreKitEnv": true
 }

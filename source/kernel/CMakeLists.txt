@@ -9,4 +9,4 @@ include(CTest)
 
 enable_testing()
 
-add_test(NAME hello_test COMMAND tests/hello_test)
+add_test(NAME kernel_tests COMMAND tests/kernel_tests)
