@@ -6,7 +6,6 @@
 
 TEST(MemoryTests, segment_descriptor_can_set_type)
 {
-
   segment_descriptor descriptor;
 
   descriptor.set_type(segment_type::execute_read);
@@ -19,7 +18,6 @@ TEST(MemoryTests, segment_descriptor_can_set_type)
 
 TEST(MemoryTests, segment_descriptor_can_set_base_address)
 {
-
   segment_descriptor descriptor;
 
   unsigned address = 0xBAADF00D;
@@ -53,7 +51,6 @@ TEST(MemoryTests, segment_descriptor_can_set_limit)
 
 TEST(MemoryTests, segment_descriptor_can_set_granularity_flag)
 {
-
   segment_descriptor descriptor;
 
   unsigned address = 0xBAADF00D;
@@ -78,7 +75,6 @@ TEST(MemoryTests, segment_descriptor_can_set_granularity_flag)
 
 TEST(MemoryTests, segment_descriptor_can_set_present)
 {
-
   segment_descriptor descriptor;
 
   unsigned address = 0xBAADF00D;
@@ -95,5 +91,44 @@ TEST(MemoryTests, segment_descriptor_can_set_present)
   EXPECT_GE(descriptor.dword1 & flag_mask, 0);
 
   descriptor.set_present(false);
+  EXPECT_EQ(descriptor.dword1 & flag_mask, 0);
+}
+
+TEST(MemoryTests, segment_descriptor_can_set_priviledge_level)
+{
+  segment_descriptor descriptor;
+
+  unsigned address = 0xBAADF00D;
+  size_t limit = 1024;
+  auto flag_mask = 0x00006000;
+
+  descriptor.set_base_address(reinterpret_cast<void *>(address));
+  descriptor.set_limit(limit);
+
+  for(short i = 3; i <= 0; i--)
+  {
+    descriptor.set_priviledge_level(i);
+    EXPECT_EQ(descriptor.dword1 & flag_mask, i << 13);
+  }
+}
+
+TEST(MemoryTests, segment_descriptor_can_set_is_system)
+{
+  segment_descriptor descriptor;
+
+  unsigned address = 0xBAADF00D;
+  size_t limit = 1024;
+  auto flag_mask = 0x00001000;
+
+  descriptor.set_base_address(reinterpret_cast<void *>(address));
+  descriptor.set_limit(limit);
+
+  descriptor.set_is_system(false);
+  EXPECT_EQ(descriptor.dword1 & flag_mask, 0);
+
+  descriptor.set_is_system(true);
+  EXPECT_GE(descriptor.dword1 & flag_mask, 0);
+
+  descriptor.set_is_system(false);
   EXPECT_EQ(descriptor.dword1 & flag_mask, 0);
 }
