@@ -102,10 +102,10 @@ TEST(MemoryTests, segment_descriptor_can_set_priviledge_level)
   size_t limit = 1024;
   auto flag_mask = 0x00006000;
 
-  descriptor.set_base_address(reinterpret_cast<void *>(address));
+  descriptor.set_base_address(reinterpret_cast<void*>(address));
   descriptor.set_limit(limit);
 
-  for(short i = 3; i <= 0; i--)
+  for(short i = 3; i >= 0; i--)
   {
     descriptor.set_priviledge_level(i);
     EXPECT_EQ(descriptor.dword1 & flag_mask, i << 13);
@@ -124,11 +124,11 @@ TEST(MemoryTests, segment_descriptor_can_set_is_system)
   descriptor.set_limit(limit);
 
   descriptor.set_is_system(false);
-  EXPECT_EQ(descriptor.dword1 & flag_mask, 0);
-
-  descriptor.set_is_system(true);
   EXPECT_GE(descriptor.dword1 & flag_mask, 0);
 
-  descriptor.set_is_system(false);
+  descriptor.set_is_system(true);
   EXPECT_EQ(descriptor.dword1 & flag_mask, 0);
+
+  descriptor.set_is_system(false);
+  EXPECT_GE(descriptor.dword1 & flag_mask, 0);
 }

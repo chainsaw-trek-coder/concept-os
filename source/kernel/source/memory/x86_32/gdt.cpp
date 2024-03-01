@@ -75,7 +75,7 @@ void segment_descriptor::set_present(bool is_present)
 void segment_descriptor::set_priviledge_level(unsigned char priviledge)
 {
     dword1 &= 0xFFFF9FFF;
-    dword1 |= (0x03 & priviledge) << 14;
+    dword1 |= (0x03 & priviledge) << 13;
 }
 
 void segment_descriptor::set_is_system(bool is_system)
