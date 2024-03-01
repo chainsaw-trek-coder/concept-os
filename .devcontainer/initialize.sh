@@ -12,4 +12,9 @@ sudo apt install x11vnc xvfb fluxbox supervisor novnc -y
 sudo apt-get install qemu-system -y
 sudo apt install qemu-kvm -y
 
+# Development Tools
+sudo apt-get install gcc-multilib g++-multilib
+sudo apt install gdb -y
+sudo apt install cmake -y
+
 /workspaces/concept-os/.devcontainer/get-cross-compiler.sh

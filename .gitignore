@@ -4,3 +4,5 @@
 helloworld/isodir/**
 *.log
 *.pid
+
+build/**

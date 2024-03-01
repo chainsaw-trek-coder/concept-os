@@ -1,0 +1,19 @@
+[
+    {
+        "name": "i686 Cross-Compiler",
+        "compilers": {
+            "ASM-ATT": "/home/vscode/opt/cross/bin/i686-elf-as",
+            "CC": "/home/vscode/opt/cross/bin/i686-elf-gcc",
+            "CXX": "/home/vscode/opt/cross/bin/i686-elf-g++"
+        },
+        "toolchainFile": "${workspaceFolder}/.vscode/i686-toolchain.cmake",
+        "cmakeSettings": {
+            "CMAKE_C_COMPILER_WORKS": "1",
+            "CMAKE_CXX_COMPILER_WORKS": "1",
+            "CMAKE_FIND_ROOT_PATH": "/home/vscode/opt/cross/bin/",
+            "CMAKE_C_FLAGS": "-ffreestanding -O2 -nostdlib",
+            "CMAKE_SHARED_LIBRARY_LINK_C_FLAGS": "\"\"",
+            "CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS": "\"\""
+        }
+    }
+]
