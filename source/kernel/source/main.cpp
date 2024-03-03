@@ -15,6 +15,8 @@
 
 #if defined(__i386__)
 #include "x86_32/multiboot.h"
+#include "x86_32/cpu.h"
+#include "memory/x86_32/gdt.hpp"
 #endif
 
 #if defined(__x86_64__)
@@ -131,6 +133,24 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		int_to_string(global_mem_size, string_buffer);
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
+
+		// Setup gdt.
+		auto &segment = gdt.segments[0];
+		segment.set_base_address(global_mem_start);
+		segment.clear_granularity_flag(); // Byte sizes
+		segment.set_is_system(true);
+		segment.set_limit(global_mem_size);
+		segment.set_present(true);
+		segment.set_priviledge_level(0);
+		segment.set_type(segment_type::read_write_expand_down);
+
+		// Setup registers.
+		cpu::set_cs(&gdt.segments[0]);
+		cpu::set_ds(&gdt.segments[0]);
+		cpu::set_es(&gdt.segments[0]);
+		cpu::set_fs(&gdt.segments[0]);
+		cpu::set_gs(&gdt.segments[0]);
+		cpu::set_ss(&gdt.segments[0]);
 	}
 	else
 	{
