@@ -8,9 +8,13 @@ struct page_table_entry
 {
     unsigned data;
 
-    // bool is_global_page();
-    // bool page_table_attribute_index();
-    // bool is_dirty();
+    page_table_entry();
+
+    bool is_global_page();
+    void set_global_page(bool is_global_page);
+    bool page_table_attribute_index();
+    bool is_dirty();
+    void set_dirty(bool is_dirty);
     // bool is_accessed();
     // bool is_cache_disabled();
     // bool is_write_Through();
@@ -25,7 +29,7 @@ struct page_table
 };
 
 struct page_directory_entry
-{
+{ 
     unsigned data;
 
     page_directory_entry();

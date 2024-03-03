@@ -1,5 +1,51 @@
 #include "memory/x86_32/paging.hpp"
 
+// TODO: Inline all of these functions for performance.
+
+// Page table functions.
+
+page_table_entry::page_table_entry()
+{
+    data = 0;
+}
+
+bool page_table_entry::is_global_page()
+{
+    return (data & 0x100) > 0;
+}
+
+void page_table_entry::set_global_page(bool is_global_page)
+{
+    if(is_global_page)
+        data |= 0x100;
+    else
+        data &= ~(0x100);
+}
+
+bool page_table_entry::page_table_attribute_index()
+{
+    auto mask = 0x80;
+    return (data & mask) > 0;
+}
+
+bool page_table_entry::is_dirty()
+{
+    auto mask = 0x40;
+    return (data & mask) > 0;
+}
+
+void page_table_entry:set_dirty(bool is_dirty)
+{
+    auto mask = 0x40;
+    
+    if(is_dirty)
+        data |= mask;
+    else
+        data &= ~mask;
+}
+
+// Page directory entry functions.
+
 page_directory_entry::page_directory_entry()
 {
     data = 0;
