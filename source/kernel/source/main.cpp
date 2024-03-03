@@ -144,13 +144,15 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		segment.set_priviledge_level(0);
 		segment.set_type(segment_type::read_write_expand_down);
 
+		cpu::set_gdtr(&gdt);
+
 		// Setup registers.
-		cpu::set_cs(&gdt.segments[0]);
-		cpu::set_ds(&gdt.segments[0]);
-		cpu::set_es(&gdt.segments[0]);
-		cpu::set_fs(&gdt.segments[0]);
-		cpu::set_gs(&gdt.segments[0]);
-		cpu::set_ss(&gdt.segments[0]);
+		cpu::set_cs(1, false, 0);
+		cpu::set_ds(1, false, 0);
+		cpu::set_es(1, false, 0);
+		cpu::set_fs(1, false, 0);
+		cpu::set_gs(1, false, 0);
+		cpu::set_ss(1, false, 0);
 	}
 	else
 	{
