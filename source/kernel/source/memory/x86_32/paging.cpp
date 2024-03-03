@@ -1,5 +1,10 @@
 #include "memory/x86_32/paging.hpp"
 
+page_directory_entry::page_directory_entry()
+{
+    data = 0;
+}
+
 void page_directory_entry::set_address(page_table_entry *address)
 {
     // TODO: Should I check that the address is 4K aligned here

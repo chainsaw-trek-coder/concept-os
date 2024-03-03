@@ -23,6 +23,8 @@ struct page_directory_entry
 {
     unsigned data;
 
+    page_directory_entry();
+
     void set_address(page_table_entry* address);
     page_table_entry* get_address();
     bool is_4mb_page();
@@ -35,4 +37,4 @@ struct page_directory_entry
     void set_writable(bool is_writable);
     bool is_present();
     void set_present(bool is_present);
-};
+};44
