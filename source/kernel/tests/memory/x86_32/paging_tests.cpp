@@ -6,6 +6,7 @@
 #include "memory/x86_32/paging.hpp"
 
 // Page table tests
+
 TEST(MemoryTests, page_table_entry_can_set_address)
 {
     // Allocate page aligned page table entry.
@@ -21,6 +22,35 @@ TEST(MemoryTests, page_table_entry_can_set_address)
 
     EXPECT_EQ(reinterpret_cast<unsigned>(aligned_data), entry.data & 0xFFFFF000);
     EXPECT_EQ(0, entry.data & 0xFFF);
+    EXPECT_EQ(entry.get_address(), reinterpret_cast<void*>(aligned_data));
+}
+
+TEST(MemoryTests, page_table_entry_can_set_global)
+{
+    // Allocate page aligned page table entry.
+    auto data = new char[4096 * 2];
+    auto_delete<char> _(data);
+
+    auto aligned_data = get_aligned_address(reinterpret_cast<void*>(data));
+
+    page_table_entry entry;
+
+    entry.data = 0;
+    entry.set_address(reinterpret_cast<void*>(aligned_data));
+
+    auto mask = 0x100;
+
+    entry.set_global_page(true);
+    EXPECT_EQ(entry.is_global_page(), true);
+    EXPECT_EQ((entry.data & mask) > 0, true);
+
+    entry.set_global_page(false);
+    EXPECT_EQ(entry.is_global_page(), false);
+    EXPECT_EQ(entry.data & mask, 0);
+
+    entry.set_global_page(true);
+    EXPECT_EQ(entry.is_global_page(), true);
+    EXPECT_EQ((entry.data & mask) > 0, true);
 }
 
 // Page directory tests
@@ -41,6 +71,7 @@ TEST(MemoryTests, page_directory_entry_can_set_address)
 
     EXPECT_EQ(reinterpret_cast<unsigned>(aligned_data), entry.data & 0xFFFFF000);
     EXPECT_EQ(0, entry.data & 0xFFF);
+    EXPECT_EQ(entry.get_address(), reinterpret_cast<void*>(aligned_data));
 }
 
 TEST(MemoryTests, page_directory_entry_can_set_writable)
