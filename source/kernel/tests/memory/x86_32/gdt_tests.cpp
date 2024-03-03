@@ -2,7 +2,6 @@
 
 #if defined(__i386__)
 #include "memory/x86_32/gdt.hpp"
-#endif
 
 TEST(MemoryTests, segment_descriptor_can_set_type)
 {
@@ -132,3 +131,5 @@ TEST(MemoryTests, segment_descriptor_can_set_is_system)
   descriptor.set_is_system(false);
   EXPECT_GE(descriptor.dword1 & flag_mask, 0);
 }
+
+#endif

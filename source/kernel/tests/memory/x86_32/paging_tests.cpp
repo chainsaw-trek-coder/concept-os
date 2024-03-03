@@ -4,7 +4,6 @@
 
 #if defined(__i386__)
 #include "memory/x86_32/paging.hpp"
-#endif
 
 TEST(MemoryTests, page_directory_entry_can_address)
 {
@@ -23,3 +22,5 @@ TEST(MemoryTests, page_directory_entry_can_address)
     EXPECT_EQ(reinterpret_cast<unsigned>(aligned_data), entry.data & 0xFFFFF000);
     EXPECT_EQ(0, entry.data & 0xFFF);
 }
+
+#endif
