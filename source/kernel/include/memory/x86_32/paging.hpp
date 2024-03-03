@@ -1,7 +1,7 @@
 enum page_directory_entry_type
 {
-    user,
-    supervisor
+    user = 1,
+    supervisor = 2
 };
 
 struct page_table_entry
@@ -28,9 +28,9 @@ struct page_directory_entry
     bool is_4mb_page();
     bool is_accessed();
     void clear_accessed();
-    // bool is_cache_disabled();
-    // bool is_write_through();
-    // page_directory_entry_type get_type();
-    // bool is_writable();
-    // bool is_present();
+    bool is_cache_disabled();
+    bool is_write_through();
+    page_directory_entry_type get_type();
+    bool is_writable();
+    bool is_present();
 };

@@ -31,3 +31,30 @@ void page_directory_entry::clear_accessed()
     // Clear 5th bit. 0xD == 13 or 1101.
     data &= 0xFFFFFFDF;
 }
+bool page_directory_entry::is_cache_disabled()
+{
+    return data & 0x10;
+}
+
+bool page_directory_entry::is_write_through()
+{
+    return data & 0x8;
+}
+
+page_directory_entry_type page_directory_entry::get_type()
+{
+    if(data & 0x4)
+        return page_directory_entry_type::user;
+    else
+        return page_directory_entry_type::supervisor;
+}
+
+bool page_directory_entry::is_writable()
+{
+    return data & 0x2 > 0;
+}
+
+bool page_directory_entry::is_present()
+{
+    return false;
+}
