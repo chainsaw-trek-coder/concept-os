@@ -10,6 +10,8 @@ struct page_table_entry
 
     page_table_entry();
 
+    void set_address(void* address);
+    void* get_address();
     bool is_global_page();
     void set_global_page(bool is_global_page);
     bool page_table_attribute_index();

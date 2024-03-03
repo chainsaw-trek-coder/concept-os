@@ -5,7 +5,27 @@
 #if defined(__i386__)
 #include "memory/x86_32/paging.hpp"
 
-TEST(MemoryTests, page_directory_entry_can_address)
+// Page table tests
+TEST(MemoryTests, page_table_entry_can_set_address)
+{
+    // Allocate page aligned page table entry.
+    auto data = new char[4096 * 2];
+    auto_delete<char> _(data);
+
+    auto aligned_data = get_aligned_address(reinterpret_cast<void*>(data));
+
+    page_table_entry entry;
+
+    entry.data = 0;
+    entry.set_address(reinterpret_cast<void*>(aligned_data));
+
+    EXPECT_EQ(reinterpret_cast<unsigned>(aligned_data), entry.data & 0xFFFFF000);
+    EXPECT_EQ(0, entry.data & 0xFFF);
+}
+
+// Page directory tests
+
+TEST(MemoryTests, page_directory_entry_can_set_address)
 {
     // Allocate page aligned page table entry.
     auto data = new char[sizeof(page_table_entry) + 4096];

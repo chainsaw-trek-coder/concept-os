@@ -9,6 +9,21 @@ page_table_entry::page_table_entry()
     data = 0;
 }
 
+void page_table_entry::set_address(void* address)
+{
+    // TODO: Should I check that the address is 4K aligned here
+    //       or in a unit test of code using this method? 🤔
+
+    data &= 0xFFF; // Clear current base address.
+    data |= (reinterpret_cast<unsigned>(address) & 0xFFFFF000);
+}
+
+void *page_table_entry::get_address()
+{
+    // Make sure to chop off the flags.
+    return reinterpret_cast<void *>(data & 0xFFFFF000);
+}
+
 bool page_table_entry::is_global_page()
 {
     return (data & 0x100) > 0;
