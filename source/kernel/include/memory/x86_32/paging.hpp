@@ -1,35 +1,59 @@
-enum page_directory_entry_type
+enum page_entry_type
 {
-    user,
-    supervisor
-};
-
-struct page_directory_entry
-{
-    unsigned data;
-
-    // void set_address(void* address);
-    // void* get_address();
-    // bool is_4mb_page();
-    // bool is_accessed();
-    // bool is_cache_disabled();
-    // bool is_write_through();
-    // page_directory_entry_type get_type();
-    // bool is_writable();
-    // bool is_present();
+    user = 1,
+    supervisor = 2
 };
 
 struct page_table_entry
 {
     unsigned data;
 
-    // bool is_global_page();
-    // bool page_table_attribute_index();
-    // bool is_dirty();
-    // bool is_accessed();
-    // bool is_cache_disabled();
-    // bool is_write_Through();
-    // page_directory_entry_type get_type();
-    // bool is_writable();
-    // bool is_present();
+    page_table_entry();
+
+    void set_address(void* address);
+    void* get_address();
+    bool is_global_page();
+    void set_global_page(bool is_global_page);
+    short page_table_attribute_index();
+    bool is_dirty();
+    void set_dirty(bool is_dirty);
+    bool is_accessed();
+    void clear_accessed();
+    bool is_cache_disabled();
+    bool is_write_through();
+    page_entry_type get_type();
+    bool is_writable();
+    void set_writable(bool is_writable);
+    bool is_present();
+    void set_present(bool is_present);
+};
+
+struct page_table
+{
+    page_table_entry entries[1024];
+};
+
+struct page_directory_entry
+{ 
+    unsigned data;
+
+    page_directory_entry();
+
+    void set_address(page_table *address);
+    page_table *get_address();
+    bool is_4mb_page();
+    bool is_accessed();
+    void clear_accessed();
+    bool is_cache_disabled();
+    bool is_write_through();
+    page_entry_type get_type();
+    bool is_writable();
+    void set_writable(bool is_writable);
+    bool is_present();
+    void set_present(bool is_present);
+};
+
+struct page_directory
+{
+    page_entry_type entries[1024];
 };

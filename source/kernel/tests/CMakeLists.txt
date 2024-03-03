@@ -21,7 +21,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 FILE(GLOB C_SRCS *.cpp **/*.cpp memory/*/*.cpp)
-FILE(GLOB KERNEL_SRCS ../source/*.cpp ../source/**/*.cpp ../source/memory/*/*.cpp)
+FILE(GLOB KERNEL_SRCS ../source/*.cpp ../source/*/*.cpp ../source/memory/*/*.cpp)
 
 enable_testing()
 
