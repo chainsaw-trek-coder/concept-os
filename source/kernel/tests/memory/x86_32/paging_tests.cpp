@@ -5,7 +5,7 @@
 #if defined(__i386__)
 #include "memory/x86_32/paging.hpp"
 
-// Page table tests
+/* Page table tests */
 
 TEST(MemoryTests, page_table_entry_can_set_address)
 {
@@ -53,7 +53,7 @@ TEST(MemoryTests, page_table_entry_can_set_global)
     EXPECT_EQ((entry.data & mask) > 0, true);
 }
 
-// Page directory tests
+/* Page directory tests */
 
 TEST(MemoryTests, page_directory_entry_can_set_address)
 {

@@ -81,12 +81,12 @@ bool page_table_entry::is_write_through()
     return data & 0x8;
 }
 
-page_directory_entry_type page_table_entry::get_type()
+page_entry_type page_table_entry::get_type()
 {
     if (data & 0x4)
-        return page_directory_entry_type::user;
+        return page_entry_type::user;
     else
-        return page_directory_entry_type::supervisor;
+        return page_entry_type::supervisor;
 }
 
 bool page_table_entry::is_writable()
@@ -167,12 +167,12 @@ bool page_directory_entry::is_write_through()
     return data & 0x8;
 }
 
-page_directory_entry_type page_directory_entry::get_type()
+page_entry_type page_directory_entry::get_type()
 {
     if (data & 0x4)
-        return page_directory_entry_type::user;
+        return page_entry_type::user;
     else
-        return page_directory_entry_type::supervisor;
+        return page_entry_type::supervisor;
 }
 
 bool page_directory_entry::is_writable()

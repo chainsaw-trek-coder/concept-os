@@ -1,4 +1,4 @@
-enum page_directory_entry_type
+enum page_entry_type
 {
     user = 1,
     supervisor = 2
@@ -21,7 +21,7 @@ struct page_table_entry
     void clear_accessed();
     bool is_cache_disabled();
     bool is_write_through();
-    page_directory_entry_type get_type();
+    page_entry_type get_type();
     bool is_writable();
     void set_writable(bool is_writable);
     bool is_present();
@@ -46,7 +46,7 @@ struct page_directory_entry
     void clear_accessed();
     bool is_cache_disabled();
     bool is_write_through();
-    page_directory_entry_type get_type();
+    page_entry_type get_type();
     bool is_writable();
     void set_writable(bool is_writable);
     bool is_present();
@@ -55,5 +55,5 @@ struct page_directory_entry
 
 struct page_directory
 {
-    page_directory_entry_type entries[1024];
+    page_entry_type entries[1024];
 };
