@@ -34,7 +34,7 @@ bool page_table_entry::is_dirty()
     return (data & mask) > 0;
 }
 
-void page_table_entry:set_dirty(bool is_dirty)
+void page_table_entry::set_dirty(bool is_dirty)
 {
     auto mask = 0x40;
     
