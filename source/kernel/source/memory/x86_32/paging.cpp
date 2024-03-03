@@ -59,6 +59,28 @@ void page_table_entry::set_dirty(bool is_dirty)
         data &= ~mask;
 }
 
+short page_table_entry::page_table_attribute_index()
+{
+    auto mask = 0x80;
+    return (data & mask) ? 1 : 0;
+}
+
+bool page_table_entry::is_dirty()
+{
+    auto mask = 0x40;
+    return (data & mask) > 0;
+}
+
+void page_table_entry::set_dirty(bool is_dirty)
+{
+    auto mask = 0x40;
+
+    if(is_dirty)
+        data |= mask;
+    else
+        data &= ~mask;
+}
+
 // Page directory entry functions.
 
 page_directory_entry::page_directory_entry()
