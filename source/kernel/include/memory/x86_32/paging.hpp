@@ -17,12 +17,15 @@ struct page_table_entry
     short page_table_attribute_index();
     bool is_dirty();
     void set_dirty(bool is_dirty);
-    // bool is_accessed();
-    // bool is_cache_disabled();
-    // bool is_write_Through();
-    // page_directory_entry_type get_type();
-    // bool is_writable();
-    // bool is_present();
+    bool is_accessed();
+    void clear_accessed();
+    bool is_cache_disabled();
+    bool is_write_through();
+    page_directory_entry_type get_type();
+    bool is_writable();
+    void set_writable(bool is_writable);
+    bool is_present();
+    void set_present(bool is_present);
 };
 
 struct page_table

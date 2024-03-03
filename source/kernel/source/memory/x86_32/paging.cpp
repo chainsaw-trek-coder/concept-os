@@ -2,7 +2,7 @@
 
 // TODO: Inline all of these functions for performance.
 
-// Page table functions.
+/* Page table functions. */
 
 page_table_entry::page_table_entry()
 {
@@ -21,7 +21,7 @@ void page_table_entry::set_address(void* address)
 void *page_table_entry::get_address()
 {
     // Make sure to chop off the flags.
-    return reinterpret_cast<void *>(data & 0xFFFFF000);
+    return reinterpret_cast<void*>(data & 0xFFFFF000);
 }
 
 bool page_table_entry::is_global_page()
@@ -37,33 +37,12 @@ void page_table_entry::set_global_page(bool is_global_page)
         data &= ~(0x100);
 }
 
-bool page_table_entry::page_table_attribute_index()
-{
-    auto mask = 0x80;
-    return (data & mask) > 0;
-}
-
-bool page_table_entry::is_dirty()
-{
-    auto mask = 0x40;
-    return (data & mask) > 0;
-}
-
-void page_table_entry::set_dirty(bool is_dirty)
-{
-    auto mask = 0x40;
-    
-    if(is_dirty)
-        data |= mask;
-    else
-        data &= ~mask;
-}
-
 short page_table_entry::page_table_attribute_index()
 {
     auto mask = 0x80;
-    return (data & mask) ? 1 : 0;
+    return (data & mask) > 0;
 }
+
 
 bool page_table_entry::is_dirty()
 {
@@ -81,7 +60,66 @@ void page_table_entry::set_dirty(bool is_dirty)
         data &= ~mask;
 }
 
-// Page directory entry functions.
+// TODO: Write a test that checks this flag is set after page is "accessed"
+bool page_table_entry::is_accessed()
+{
+    return data & 0x20;
+}
+
+void page_table_entry::clear_accessed()
+{
+    data &= ~(0x20);
+}
+
+bool page_table_entry::is_cache_disabled()
+{
+    return data & 0x10;
+}
+
+bool page_table_entry::is_write_through()
+{
+    return data & 0x8;
+}
+
+page_directory_entry_type page_table_entry::get_type()
+{
+    if (data & 0x4)
+        return page_directory_entry_type::user;
+    else
+        return page_directory_entry_type::supervisor;
+}
+
+bool page_table_entry::is_writable()
+{
+    return (data & 0x2) > 0;
+}
+
+void page_table_entry::set_writable(bool is_writable)
+{
+    auto mask = 0x2;
+
+    if(is_writable)
+        data |= mask;
+    else
+        data &= ~mask;
+}
+
+bool page_table_entry::is_present()
+{
+    return (data & 0x1) > 0;
+}
+
+void page_table_entry::set_present(bool is_present)
+{
+    auto mask = 0x1;
+
+    if(is_present)
+        data |= mask;
+    else
+        data &= ~mask;
+}
+
+/* Page directory entry functions. */
 
 page_directory_entry::page_directory_entry()
 {
@@ -116,8 +154,8 @@ bool page_directory_entry::is_accessed()
 
 void page_directory_entry::clear_accessed()
 {
-    // Clear 5th bit. 0xD == 13 or 1101.
-    data &= 0xFFFFFFDF;
+    // Clear 5th bit.
+    data &= ~(0x20);
 }
 bool page_directory_entry::is_cache_disabled()
 {
@@ -144,10 +182,12 @@ bool page_directory_entry::is_writable()
 
 void page_directory_entry::set_writable(bool is_writable)
 {
+    auto mask = 0x2;
+
     if(is_writable)
-        data |= 0x2;
+        data |= mask;
     else
-        data &= 0xFFFFFFFD;
+        data &= ~mask;
 }
 
 bool page_directory_entry::is_present()
@@ -157,8 +197,10 @@ bool page_directory_entry::is_present()
 
 void page_directory_entry::set_present(bool is_present)
 {
+    auto mask = 0x1;
+
     if(is_present)
-        data |= 0x1;
+        data |= mask;
     else
-        data &= 0xFFFFFFFE;
+        data &= ~mask;
 }
