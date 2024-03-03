@@ -17,7 +17,7 @@ TEST(MemoryTests, page_directory_entry_can_address)
     page_directory_entry entry;
 
     entry.data = 0;
-    entry.set_address(reinterpret_cast<page_table_entry*>(aligned_data));
+    entry.set_address(reinterpret_cast<page_table*>(aligned_data));
 
     EXPECT_EQ(reinterpret_cast<unsigned>(aligned_data), entry.data & 0xFFFFF000);
     EXPECT_EQ(0, entry.data & 0xFFF);
@@ -35,7 +35,7 @@ TEST(MemoryTests, page_directory_entry_can_set_writable)
     page_directory_entry entry;
 
     entry.data = 0;
-    entry.set_address(reinterpret_cast<page_table_entry*>(aligned_data));
+    entry.set_address(reinterpret_cast<page_table*>(aligned_data));
 
     entry.set_writable(true);
     EXPECT_EQ(entry.is_writable(), true);
@@ -62,7 +62,7 @@ TEST(MemoryTests, page_directory_entry_can_set_present)
     page_directory_entry entry;
 
     entry.data = 0;
-    entry.set_address(reinterpret_cast<page_table_entry*>(aligned_data));
+    entry.set_address(reinterpret_cast<page_table*>(aligned_data));
 
     entry.set_present(true);
     EXPECT_EQ(entry.is_present(), true);

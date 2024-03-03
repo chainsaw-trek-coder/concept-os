@@ -5,7 +5,7 @@ page_directory_entry::page_directory_entry()
     data = 0;
 }
 
-void page_directory_entry::set_address(page_table_entry *address)
+void page_directory_entry::set_address(page_table *address)
 {
     // TODO: Should I check that the address is 4K aligned here
     //       or in a unit test of code using this method? 🤔
@@ -14,10 +14,10 @@ void page_directory_entry::set_address(page_table_entry *address)
     data |= (reinterpret_cast<unsigned>(address) & 0xFFFFF000);
 }
 
-page_table_entry *page_directory_entry::get_address()
+page_table *page_directory_entry::get_address()
 {
     // Make sure to chop off the flags.
-    return reinterpret_cast<page_table_entry *>(data & 0xFFFFF000);
+    return reinterpret_cast<page_table *>(data & 0xFFFFF000);
 }
 
 bool page_directory_entry::is_4mb_page()

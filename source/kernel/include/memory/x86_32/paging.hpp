@@ -19,14 +19,19 @@ struct page_table_entry
     // bool is_present();
 };
 
+struct page_table
+{
+    page_table_entry entries[1024];
+};
+
 struct page_directory_entry
 {
     unsigned data;
 
     page_directory_entry();
 
-    void set_address(page_table_entry* address);
-    page_table_entry* get_address();
+    void set_address(page_table *address);
+    page_table *get_address();
     bool is_4mb_page();
     bool is_accessed();
     void clear_accessed();
@@ -37,4 +42,9 @@ struct page_directory_entry
     void set_writable(bool is_writable);
     bool is_present();
     void set_present(bool is_present);
+};
+
+struct page_directory
+{
+    page_directory_entry_type entries[1024];
 };
