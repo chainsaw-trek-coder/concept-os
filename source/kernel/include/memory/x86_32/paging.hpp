@@ -37,4 +37,4 @@ struct page_directory_entry
     void set_writable(bool is_writable);
     bool is_present();
     void set_present(bool is_present);
-};44
+};
