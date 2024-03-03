@@ -32,5 +32,6 @@ struct page_directory_entry
     bool is_write_through();
     page_directory_entry_type get_type();
     bool is_writable();
+    void set_writable(bool is_writable);
     bool is_present();
 };

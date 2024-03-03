@@ -1,6 +1,6 @@
 #include "memory/x86_32/paging.hpp"
 
-void page_directory_entry::set_address(page_table_entry* address)
+void page_directory_entry::set_address(page_table_entry *address)
 {
     // TODO: Should I check that the address is 4K aligned here
     //       or in a unit test of code using this method? 🤔
@@ -9,10 +9,10 @@ void page_directory_entry::set_address(page_table_entry* address)
     data |= (reinterpret_cast<unsigned>(address) & 0xFFFFF000);
 }
 
-page_table_entry* page_directory_entry::get_address()
+page_table_entry *page_directory_entry::get_address()
 {
     // Make sure to chop off the flags.
-    return reinterpret_cast<page_table_entry*>(data & 0xFFFFF000);
+    return reinterpret_cast<page_table_entry *>(data & 0xFFFFF000);
 }
 
 bool page_directory_entry::is_4mb_page()
@@ -43,7 +43,7 @@ bool page_directory_entry::is_write_through()
 
 page_directory_entry_type page_directory_entry::get_type()
 {
-    if(data & 0x4)
+    if (data & 0x4)
         return page_directory_entry_type::user;
     else
         return page_directory_entry_type::supervisor;
@@ -51,7 +51,15 @@ page_directory_entry_type page_directory_entry::get_type()
 
 bool page_directory_entry::is_writable()
 {
-    return data & 0x2 > 0;
+    return (data & 0x2) > 0;
+}
+
+void page_directory_entry::set_writable(bool is_writable)
+{
+    if(is_writable)
+        data |= 0x2;
+    else
+        data &= 0xFFFFFFFD;
 }
 
 bool page_directory_entry::is_present()
