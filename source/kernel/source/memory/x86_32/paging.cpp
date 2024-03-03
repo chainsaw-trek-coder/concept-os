@@ -64,5 +64,13 @@ void page_directory_entry::set_writable(bool is_writable)
 
 bool page_directory_entry::is_present()
 {
-    return false;
+    return (data & 0x1) > 0;
+}
+
+void page_directory_entry::set_present(bool is_present)
+{
+    if(is_present)
+        data |= 0x1;
+    else
+        data &= 0xFFFFFFFE;
 }

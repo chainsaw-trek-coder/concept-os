@@ -50,4 +50,31 @@ TEST(MemoryTests, page_directory_entry_can_set_writable)
     EXPECT_EQ((entry.data & 0x2) > 0, true);
 }
 
+TEST(MemoryTests, page_directory_entry_can_set_present)
+{
+    // Allocate page aligned page table entry.
+    auto data = new char[sizeof(page_table_entry) + 4096];
+    auto_delete<char> _(data);
+
+    auto aligned_data = get_aligned_address(reinterpret_cast<void*>(data));
+    auto table_entry = reinterpret_cast<page_table_entry*>(aligned_data);
+
+    page_directory_entry entry;
+
+    entry.data = 0;
+    entry.set_address(reinterpret_cast<page_table_entry*>(aligned_data));
+
+    entry.set_present(true);
+    EXPECT_EQ(entry.is_present(), true);
+    EXPECT_EQ((entry.data & 0x1) > 0, true);
+
+    entry.set_present(false);
+    EXPECT_EQ(entry.is_present(), false);
+    EXPECT_EQ(entry.data & 0x1, 0);
+
+    entry.set_present(true);
+    EXPECT_EQ(entry.is_present(), true);
+    EXPECT_EQ((entry.data & 0x1) > 0, true);
+}
+
 #endif
