@@ -1,5 +1,8 @@
 // Contains structures for the Global Descriptor Table.
 
+#ifndef c23f5718_db56_4fa5_9c2f_89a9e2585dd2
+#define c23f5718_db56_4fa5_9c2f_89a9e2585dd2
+
 #include <stddef.h>
 
 enum segment_type
@@ -90,3 +93,5 @@ struct flat_global_descriptor_table
 
     flat_global_descriptor_table(void* base, size_t size_in_bytes);
 };
+
+#endif

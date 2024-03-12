@@ -1,3 +1,6 @@
+#include "memory/memory.h"
+
+global_descriptor_table<1> gdt;
 void* global_mem_start = nullptr;
 
 #if defined(__i386__)
