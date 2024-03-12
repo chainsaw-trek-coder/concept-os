@@ -136,10 +136,10 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 
 		// Setup gdt.
 		auto &segment = gdt.segments[0];
-		segment.set_base_address(global_mem_start);
+		segment.set_base_address(nullptr);
 		segment.clear_granularity_flag(); // Byte sizes
 		segment.set_is_system(true);
-		segment.set_limit(global_mem_size);
+		segment.set_limit(reinterpret_cast<size_t>(global_mem_start) + global_mem_size);
 		segment.set_present(true);
 		segment.set_priviledge_level(0);
 		segment.set_type(segment_type::read_write_expand_down);
@@ -153,6 +153,8 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		cpu::set_fs(1, false, 0);
 		cpu::set_gs(1, false, 0);
 		cpu::set_ss(1, false, 0);
+
+		terminal_writestring("Finished setting up CPU...\n");
 	}
 	else
 	{
