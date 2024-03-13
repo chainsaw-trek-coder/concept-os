@@ -13,6 +13,9 @@
             "path": "./source/kernel"
         },
         {
+            "name": "ipc",
+            "path": "./source/ipc"
+        },        {
             "name": "os.text-mode-driver",
             "path": "./source/packages/os.text-mode-driver"
         },
