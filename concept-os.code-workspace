@@ -13,6 +13,10 @@
             "path": "./source/kernel"
         },
         {
+            "name": "os.text-mode-driver",
+            "path": "./source/packages/os.text-mode-driver"
+        },
+        {
             "name": "build",
             "path": "./build"
         },
