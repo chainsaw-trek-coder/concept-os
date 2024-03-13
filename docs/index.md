@@ -14,3 +14,7 @@ Architecture
 - Anonymous users are those that are not logged in.
 - OS starts logged in as anonymous.
 - Most apps are treated equally.
+
+For Future Reference:
+
+[Embedding files in ELF.](https://stackoverflow.com/questions/5479691/is-there-any-standard-way-of-embedding-resources-into-linux-executable-image)
