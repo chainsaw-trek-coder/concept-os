@@ -9,12 +9,9 @@ os::ipc::os_message::os_message(os::memory::shared_ptr<os_message_descriptor> &d
     //       as well as an array of offsets of size equal to the number of
     //       parameters.
 
-    // auto initialization_array = descriptor.get_message_initization_array();
+    auto initialization_array = descriptor.value().get_message_initization_array();
 
-    // if(support_names)
-    // {
-    //      copy descriptor locally.
-    // }
+    // Copy initialization array into shared memory segment.
 }
 
 os::ipc::os_message::~os_message()
