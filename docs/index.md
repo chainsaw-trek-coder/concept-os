@@ -11,6 +11,7 @@ Architecture
 - Everything is a service.
 - No concept of an "admin" or "root".
 - Timers normally used for multi-tasking are only used to time out threads.
+- "Zero-tick" scheduling
 - Anonymous users are those that are not logged in.
 - OS starts logged in as anonymous.
 - Most apps are treated equally.
