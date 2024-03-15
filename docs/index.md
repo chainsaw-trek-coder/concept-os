@@ -20,3 +20,5 @@ For Future Reference:
 [Embedding files in ELF.](https://stackoverflow.com/questions/5479691/is-there-any-standard-way-of-embedding-resources-into-linux-executable-image)
 
 [Doug Lea's Malloc](https://gee.cs.oswego.edu/pub/misc)
+
+[Debugging Kernel in QEMU](https://wiki.osdev.org/How_Do_I_Use_A_Debugger_With_My_OS)
