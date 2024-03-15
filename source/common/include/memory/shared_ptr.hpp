@@ -128,5 +128,9 @@ namespace os::memory
             _shared->ref_count = 1;
             _shared->value = value;
         }
+        else
+        {
+            _shared = nullptr;
+        }
     }
 }
