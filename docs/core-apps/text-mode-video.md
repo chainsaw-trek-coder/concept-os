@@ -33,3 +33,7 @@ Draft Manifest:
     ]
 }
 ```
+
+Notes from x86 Documentation:
+
+We should use "write-combining" memory in order to avoid overloading the cache lines... whatever that means lol. I'm still learning here.
