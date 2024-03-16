@@ -2,7 +2,10 @@
 
 Recommended Reading:
 
+[Intel Documentation](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
+
 [Intel x86/64 Documentation Volume 3A](https://www.intel.com/content/dam/support/us/en/documents/processors/pentium4/sb/25366821.pdf#page72)
+
 [Intel x86/64 Documentation Combined Volume](https://cdrdv2-public.intel.com/812392/325462-sdm-vol-1-2abcd-3abcd-4.pdf)
 
 [ELF Documentation](https://wiki.osdev.org/ELF)
