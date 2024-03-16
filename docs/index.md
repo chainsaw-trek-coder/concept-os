@@ -2,7 +2,7 @@
 
 Recommended Reading:
 
-[Intel x86/64 Documentation](https://www.intel.com/content/dam/support/us/en/documents/processors/pentium4/sb/25366821.pdf)
+[Intel x86/64 Documentation](https://cdrdv2-public.intel.com/812392/325462-sdm-vol-1-2abcd-3abcd-4.pdf)
 
 [ELF Documentation](https://wiki.osdev.org/ELF)
 
