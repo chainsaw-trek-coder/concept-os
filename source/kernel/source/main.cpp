@@ -141,7 +141,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		segment.set_base_address(nullptr);
 		segment.clear_granularity_flag(); // Byte sizes
 		segment.set_is_system(true);
-		segment.set_limit(reinterpret_cast<size_t>(global_mem_start) + global_mem_size);
+		segment.set_limit(0xFFFFFFFF);
 		segment.set_present(true);
 		segment.set_priviledge_level(0);
 		segment.set_type(segment_type::read_write_expand_down);
@@ -158,6 +158,8 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		cpu::set_ss(1, false, 0);
 
 		terminal_writestring("Finished setting up CPU...\n");
+
+		// TODO: Setup kernel page directory.
 	}
 	else
 	{
