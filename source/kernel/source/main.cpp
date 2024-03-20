@@ -16,7 +16,7 @@
 #if defined(__i386__)
 #include "x86_32/multiboot.h"
 #include "x86_32/cpu.h"
-#include "memory/x86_32/gdt.hpp"
+#include "x86_32/globals.hpp"
 #endif
 
 #if defined(__x86_64__)
@@ -24,7 +24,6 @@
 #endif
 
 #include "terminal.h"
-#include "memory/memory.h"
 
 // Doesn't work in protected mode...
 // void get_physical_memory(short *low_mem, short *high_mem)

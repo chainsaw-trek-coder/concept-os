@@ -1,5 +1,4 @@
-#include "memory/memory.h"
-#include "memory/alloc.h"
+#include "memory/alloc.hpp"
 
 // TODO: Implement memory management.
 
