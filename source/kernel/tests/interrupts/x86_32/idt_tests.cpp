@@ -44,7 +44,7 @@ TEST(InterruptDescriptorTests, interrupt_gate_can_set_present)
 
     gate.set_present(true);
     // EXPECT_EQ(gate.is_present(), true);
-    EXPECT_EQ((gate.dowrd1 & present_mask) > 0, true);
+    EXPECT_EQ((gate.dword1 & present_mask) > 0, true);
 
     gate.set_present(false);
     // EXPECT_EQ(gate.is_present(), false);
