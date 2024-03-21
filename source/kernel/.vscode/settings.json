@@ -3,6 +3,7 @@
         "${workspaceFolder}/include",
         "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
     ],
+    "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++",
     "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel",
     "cmake.buildDirectory": "${workspaceFolder}/../../build/kernel",
     "cmake.configureSettings": {

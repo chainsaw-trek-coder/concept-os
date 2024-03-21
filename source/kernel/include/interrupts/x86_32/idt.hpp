@@ -10,7 +10,7 @@ struct interrupt_gate
 
     interrupt_gate();
 
-    void set_code_segment(short code_segment); // Should be zero as we are using protected flat model.
+    void set_code_segment(short code_segment); // Should be ONE as we are using protected flat model.
     void set_entry_point(interrupt_handler address);
     void set_present(bool is_present); // Sets whether or not the segment is currently in memory.
     void set_priviledge_level(unsigned char priviledge);
