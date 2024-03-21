@@ -3,6 +3,14 @@
 
 typedef void (*interrupt_handler)(void);
 
+enum interrupt_priviledge_level
+{
+    ring_0 = 0,
+    ring_1 = 1,
+    ring_2 = 2,
+    ring_3 = 3
+};
+
 struct interrupt_gate
 {
     unsigned dword1;
@@ -13,7 +21,7 @@ struct interrupt_gate
     void set_code_segment(short code_segment); // Should be ONE as we are using protected flat model.
     void set_entry_point(interrupt_handler address);
     void set_present(bool is_present); // Sets whether or not the segment is currently in memory.
-    void set_priviledge_level(unsigned char priviledge);
+    void set_priviledge_level(interrupt_priviledge_level priviledge);
     void set_32_bit_gate(bool is_32_bit);
 };
 
@@ -56,7 +64,7 @@ inline void interrupt_gate::set_present(bool is_present)
         dword1 &= ~mask;
 }
 
-inline void interrupt_gate::set_priviledge_level(unsigned char priviledge)
+inline void interrupt_gate::set_priviledge_level(interrupt_priviledge_level priviledge)
 {
     auto mask = 0x3 << 13;
 

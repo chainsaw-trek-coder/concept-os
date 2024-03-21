@@ -1,3 +1,6 @@
+#ifndef header_57f15ad7_5e7f_4313_a12e_65971fa13977
+#define header_57f15ad7_5e7f_4313_a12e_65971fa13977
+
 enum page_entry_type
 {
     user = 1,
@@ -57,3 +60,5 @@ struct page_directory
 {
     page_entry_type entries[1024];
 };
+
+#endif
