@@ -112,7 +112,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 
 			if (mem_entry.type > 0)
 			{
-				// print_mem_entry(mem_entry);
+				print_mem_entry(mem_entry);
 			}
 
 			if (mem_entry.type == MULTIBOOT_MEMORY_AVAILABLE)
@@ -133,7 +133,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
 
-		terminal_writestring("Constructing GDT...\n");
+		// terminal_writestring("Constructing GDT...\n");
 
 		// Setup gdt.
 		auto &segment = gdt.segments[0];
@@ -145,7 +145,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		segment.set_priviledge_level(0);
 		segment.set_type(segment_type::read_write_expand_down);
 
-		terminal_writestring("Setting up CPU...\n");
+		// terminal_writestring("Setting up CPU...\n");
 		cpu::set_gdtr(&gdt);
 
 		// Setup registers.
@@ -156,7 +156,25 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		cpu::set_gs(1, false, 0);
 		cpu::set_ss(1, false, 0);
 
+		// Set interrupt table.
+		cpu::set_idtr(&idt);
+
 		terminal_writestring("Finished setting up CPU...\n");
+
+		terminal_writestring("Location of idt is ");
+		ptr_to_hex_string(&idt, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Location of terminal_writestring is ");
+		ptr_to_hex_string(reinterpret_cast<void *>(terminal_writestring), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("End of kernel is ");
+		ptr_to_hex_string(reinterpret_cast<void *>(end_of_kernel), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
 
 		// TODO: Setup kernel page directory.
 	}

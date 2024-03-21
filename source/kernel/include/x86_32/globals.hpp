@@ -6,3 +6,5 @@ extern void *global_mem_start;
 extern global_descriptor_table<1> gdt;
 
 extern interrupt_descriptor_table idt;
+
+extern "C" void *end_of_kernel;
