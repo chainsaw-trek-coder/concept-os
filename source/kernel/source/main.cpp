@@ -112,7 +112,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 
 			if (mem_entry.type > 0)
 			{
-				print_mem_entry(mem_entry);
+				// print_mem_entry(mem_entry);
 			}
 
 			if (mem_entry.type == MULTIBOOT_MEMORY_AVAILABLE)

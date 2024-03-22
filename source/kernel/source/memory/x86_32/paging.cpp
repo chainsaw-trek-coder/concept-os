@@ -1,4 +1,5 @@
 #include "memory/x86_32/paging.hpp"
+#include "paging.hpp"
 
 // TODO: Inline all of these functions for performance.
 
@@ -79,6 +80,17 @@ bool page_table_entry::is_cache_disabled()
 bool page_table_entry::is_write_through()
 {
     return data & 0x8;
+}
+
+void page_table_entry::set_type(page_entry_type type)
+{
+    auto mask = 0x4;
+
+    if(type == page_entry_type::user)
+        data |= mask;
+    
+    if(type == page_entry_type::supervisor)
+        data &= ~mask;
 }
 
 page_entry_type page_table_entry::get_type()
