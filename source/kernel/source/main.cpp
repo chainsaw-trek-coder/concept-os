@@ -15,8 +15,8 @@
 
 #if defined(__i386__)
 #include "x86_32/multiboot.h"
-#include "x86_32/cpu.h"
 #include "x86_32/globals.hpp"
+#include "x86_32/cpu.h"
 #endif
 
 #if defined(__x86_64__)
@@ -133,41 +133,15 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
 
-		// terminal_writestring("Constructing GDT...\n");
-
-		// Setup gdt.
-		auto &segment = gdt.segments[0];
-		segment.set_base_address(nullptr);
-		segment.clear_granularity_flag(); // Byte sizes
-		segment.set_is_system(true);
-		segment.set_limit(0xFFFFFFFF);
-		segment.set_present(true);
-		segment.set_priviledge_level(0);
-		segment.set_type(segment_type::read_write_expand_down);
-
-		// terminal_writestring("Setting up CPU...\n");
-		cpu::set_gdtr(&gdt);
-
-		// Setup registers.
-		cpu::set_cs(1, false, 0);
-		cpu::set_ds(1, false, 0);
-		cpu::set_es(1, false, 0);
-		cpu::set_fs(1, false, 0);
-		cpu::set_gs(1, false, 0);
-		cpu::set_ss(1, false, 0);
+		terminal_writestring("Setting up memory...\n");
+		initialize_memory();
+		terminal_writestring("Finished setting up memory...\n");
 
 		// Set interrupt table.
 		cpu::set_idtr(&idt);
 
-		terminal_writestring("Finished setting up CPU...\n");
-
 		terminal_writestring("Location of idt is ");
 		ptr_to_hex_string(&idt, string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
-
-		terminal_writestring("Location of terminal_writestring is ");
-		ptr_to_hex_string(reinterpret_cast<void *>(terminal_writestring), string_buffer);
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
