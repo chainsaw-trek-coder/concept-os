@@ -1,5 +1,5 @@
 #include "memory/x86_32/paging.hpp"
-#include "paging.hpp"
+#include "memory/paging.hpp"
 
 // TODO: Inline all of these functions for performance.
 

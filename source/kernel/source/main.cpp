@@ -138,10 +138,15 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring("Finished setting up memory...\n");
 
 		// Set interrupt table.
-		cpu::set_idtr(&idt);
+		cpu::set_idtr(&idt, 256);
 
 		terminal_writestring("Location of idt is ");
 		ptr_to_hex_string(&idt, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Location of GDT is ");
+		ptr_to_hex_string(&gdt, string_buffer);
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
@@ -151,6 +156,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring("\n");
 
 		// TODO: Setup kernel page directory.
+		// terminal_writestring("Paging has been setup.");
 	}
 	else
 	{

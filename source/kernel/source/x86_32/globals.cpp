@@ -27,15 +27,15 @@ void initialize_segmentation()
     segment.set_priviledge_level(0);
     segment.set_type(segment_type::read_write_expand_down);
 
-    cpu::set_gdtr(&gdt);
+    cpu::set_gdtr(&gdt,2);
 
     // Setup registers.
-    cpu::set_cs(1, false, 0);
-    cpu::set_ds(1, false, 0);
+    // cpu::set_cs(1, false, 0);
+    // cpu::set_ds(1, false, 0);
     cpu::set_es(1, false, 0);
     cpu::set_fs(1, false, 0);
     cpu::set_gs(1, false, 0);
-    cpu::set_ss(1, false, 0);
+    // cpu::set_ss(1, false, 0);
 }
 
 void initialize_paging()
@@ -80,4 +80,8 @@ void initialize_memory()
 {
     initialize_segmentation();
     initialize_paging();
+
+    // Enable paging
+    cpu::set_page_directory(global_page_directory);
+    cpu::enable_paging();
 }
