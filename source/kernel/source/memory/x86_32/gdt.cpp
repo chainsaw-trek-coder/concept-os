@@ -88,10 +88,17 @@ void segment_descriptor::set_is_system(bool is_system)
 
 flat_global_descriptor_table::flat_global_descriptor_table(void *base, size_t size_in_bytes)
 {
-    code_segment.set_type(segment_type::execute_read_only_conforming);
-    data_segment.set_type(segment_type::read_write);
     code_segment.set_base_address(base);
+    code_segment.set_type(segment_type::execute_read_only_conforming);
+    code_segment.set_present(true);
+    code_segment.set_is_system(false);
+    code_segment.set_priviledge_level(0);
+
     data_segment.set_base_address(base);
+    data_segment.set_type(segment_type::read_write);        
+    data_segment.set_present(true);
+    data_segment.set_is_system(false);
+    data_segment.set_priviledge_level(0);
 
     if (size_in_bytes > 1024 * 1024)
     {
@@ -108,5 +115,13 @@ flat_global_descriptor_table::flat_global_descriptor_table(void *base, size_t si
             auto formatted_size = size_in_bytes >> 12;
             code_segment.set_limit(formatted_size);
         }
+    }
+    else
+    {
+        code_segment.clear_granularity_flag();
+        data_segment.clear_granularity_flag();
+
+        code_segment.set_limit(size_in_bytes);
+        data_segment.set_limit(size_in_bytes);
     }
 }

@@ -7,7 +7,7 @@
 
 extern unsigned global_mem_size;
 extern void *global_mem_start;
-extern global_descriptor_table<1> gdt;
+extern flat_global_descriptor_table gdt;
 
 extern interrupt_descriptor_table idt;
 

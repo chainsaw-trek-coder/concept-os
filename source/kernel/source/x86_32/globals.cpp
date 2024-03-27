@@ -4,7 +4,7 @@
 #include "x86_32/globals.hpp"
 
 // Intel recommends alignment on 8-byte boundary for best performance.
-global_descriptor_table<1> __attribute__((aligned(8))) gdt;
+flat_global_descriptor_table __attribute__((aligned(8))) gdt(0, 0xFFFFFFFF);
 void *global_mem_start = nullptr;
 unsigned global_mem_size = 0;
 
@@ -18,23 +18,23 @@ page_directory *global_page_directory = nullptr;
 void initialize_segmentation()
 {
     // Setup gdt.
-    auto &segment = gdt.segments[0];
-    segment.set_base_address(nullptr);
-    segment.clear_granularity_flag(); // Byte sizes
-    segment.set_is_system(true);
-    segment.set_limit(0xFFFFFFFF);
-    segment.set_present(true);
-    segment.set_priviledge_level(0);
-    segment.set_type(segment_type::read_write_expand_down);
+    // auto &segment = gdt.segments[0];
+    // segment.set_base_address(nullptr);
+    // segment.clear_granularity_flag(); // Byte sizes
+    // segment.set_is_system(true);
+    // segment.set_limit(0xFFFFFFFF);
+    // segment.set_present(true);
+    // segment.set_priviledge_level(0);
+    // segment.set_type(segment_type::read_write_expand_down);
 
-    cpu::set_gdtr(&gdt,2);
+    cpu::set_gdtr(&gdt,3);
 
     // Setup registers.
     // cpu::set_cs(1, false, 0);
     // cpu::set_ds(1, false, 0);
-    cpu::set_es(1, false, 0);
-    cpu::set_fs(1, false, 0);
-    cpu::set_gs(1, false, 0);
+    // cpu::set_es(1, false, 0);
+    // cpu::set_fs(2, false, 0);
+    cpu::set_gs(2, false, 0);
     // cpu::set_ss(1, false, 0);
 }
 
