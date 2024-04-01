@@ -44,7 +44,7 @@ inline void cpu::set_cs(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%cs" : : "r"(selector) : );
+        "movw %0, %%cs" : : "r"(selector) : );
 }
 
 inline void cpu::set_ss(short segment_index, bool is_ldt, char priviledge_level)
@@ -52,7 +52,7 @@ inline void cpu::set_ss(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%ss" : : "r"(selector) : );
+        "movw %0, %%ss" : : "r"(selector) : );
 }
 
 inline void cpu::set_ds(short segment_index, bool is_ldt, char priviledge_level)
@@ -60,7 +60,7 @@ inline void cpu::set_ds(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%ds" : : "r"(selector) : );
+        "movw %0, %%ds" : : "r"(selector) : );
 }
 
 inline void cpu::set_es(short segment_index, bool is_ldt, char priviledge_level)
@@ -68,7 +68,7 @@ inline void cpu::set_es(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%es" : : "r"(selector) : );
+        "movw %0, %%es" : : "r"(selector) : );
 }
 
 inline void cpu::set_fs(short segment_index, bool is_ldt, char priviledge_level)
@@ -76,7 +76,7 @@ inline void cpu::set_fs(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%fs" : : "r"(selector) : );
+        "movw %0, %%fs" : : "r"(selector) : );
 }
 
 inline void cpu::set_gs(short segment_index, bool is_ldt, char priviledge_level)
@@ -84,7 +84,7 @@ inline void cpu::set_gs(short segment_index, bool is_ldt, char priviledge_level)
     short selector = compute_selector(segment_index, is_ldt, priviledge_level);
 
     asm volatile(
-        "mov %0, %%gs" : : "r"(selector) : );
+        "movw %0, %%gs" : : "r"(selector) : );
 }
 
 inline void cpu::set_idtr(interrupt_descriptor_table *idt, unsigned short entry_count)
@@ -121,5 +121,5 @@ inline void cpu::enable_paging()
 
 inline short cpu::compute_selector(short segment_index, bool is_ldt, char priviledge_level)
 {
-    return (segment_index << 3) | (is_ldt ? 0x2 : 0) | (priviledge_level & 0x3);
+    return (segment_index << 3) | (is_ldt ? 0x4 : 0) | (priviledge_level & 0x3);
 }

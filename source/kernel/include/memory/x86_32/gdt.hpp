@@ -57,8 +57,8 @@ enum segment_type
 */
 struct __attribute__((packed)) segment_descriptor
 {
-    unsigned dword1;    
     unsigned dword2;
+    unsigned dword1;
 
     segment_descriptor();
 
@@ -85,13 +85,13 @@ struct global_descriptor_table
     segment_descriptor segments[array_size];
 };
 
-struct flat_global_descriptor_table
+struct __attribute__((packed)) flat_global_descriptor_table
 {
     segment_descriptor null_segment; // Null descriptor is never used.
     segment_descriptor code_segment;
     segment_descriptor data_segment;
 
-    flat_global_descriptor_table(void *base, size_t size_in_bytes);
+    void initialize();
 };
 
 #endif

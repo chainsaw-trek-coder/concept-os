@@ -155,6 +155,28 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
+		terminal_writestring("Data segment dword1: ");
+		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword1), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Data segment dword2: ");
+		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword2), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		auto old_gdt = reinterpret_cast<global_descriptor_table<26>*>(0x000cb2b4);
+		
+		terminal_writestring("Data segment dword1 for old gdt (1): ");
+		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword1), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Data segment dword2 for old gdt (1): ");
+		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword2), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
 		// TODO: Setup kernel page directory.
 		// terminal_writestring("Paging has been setup.");
 	}

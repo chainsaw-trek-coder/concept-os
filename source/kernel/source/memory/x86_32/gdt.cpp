@@ -48,10 +48,17 @@ void segment_descriptor::set_limit(size_t limit)
     dword1 |= (0x000F0000 & limit);
 
     // Clear Limit 15:0
-    dword2 &= 0x0000FFFF;
+    dword2 &= 0xFFFF0000;
 
     // Set Limit 15:0
     dword2 |= (0x0000FFFF & limit);
+
+    // auto target = reinterpret_cast<unsigned char*>(&dword1);
+
+    // // Encode the limit
+    // target[0] = limit & 0xFF;
+    // target[1] = (limit >> 8) & 0xFF;
+    // target[6] = (limit >> 16) & 0x0F;
 }
 
 void segment_descriptor::set_granularity_flag()
@@ -86,42 +93,26 @@ void segment_descriptor::set_is_system(bool is_system)
         dword1 |= 0x00001000;
 }
 
-flat_global_descriptor_table::flat_global_descriptor_table(void *base, size_t size_in_bytes)
+void flat_global_descriptor_table::initialize()
 {
-    code_segment.set_base_address(base);
+    code_segment.set_base_address(nullptr);
     code_segment.set_type(segment_type::execute_read_only_conforming);
     code_segment.set_present(true);
     code_segment.set_is_system(false);
     code_segment.set_priviledge_level(0);
+    code_segment.dword1 |= 0x00400000;
 
-    data_segment.set_base_address(base);
-    data_segment.set_type(segment_type::read_write);        
+    data_segment.set_base_address(nullptr);
+    data_segment.set_type(segment_type::read_write);
     data_segment.set_present(true);
     data_segment.set_is_system(false);
     data_segment.set_priviledge_level(0);
+    data_segment.dword1 |= 0x00400000;
 
-    if (size_in_bytes > 1024 * 1024)
-    {
-        code_segment.set_granularity_flag();
-        data_segment.set_granularity_flag();
+    // Set limit to 4 gig
+    code_segment.set_granularity_flag();
+    data_segment.set_granularity_flag();
 
-        if ((size_in_bytes & 0xFFF) > 0)
-        {
-            auto formatted_size = (size_in_bytes >> 12) + 1;
-            code_segment.set_limit(formatted_size);
-        }
-        else
-        {
-            auto formatted_size = size_in_bytes >> 12;
-            code_segment.set_limit(formatted_size);
-        }
-    }
-    else
-    {
-        code_segment.clear_granularity_flag();
-        data_segment.clear_granularity_flag();
-
-        code_segment.set_limit(size_in_bytes);
-        data_segment.set_limit(size_in_bytes);
-    }
+    code_segment.set_limit(0xFFFFF);
+    data_segment.set_limit(0xFFFFF);
 }

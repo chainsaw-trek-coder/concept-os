@@ -4,7 +4,7 @@
 #include "x86_32/globals.hpp"
 
 // Intel recommends alignment on 8-byte boundary for best performance.
-flat_global_descriptor_table __attribute__((aligned(8))) gdt(0, 0xFFFFFFFF);
+flat_global_descriptor_table __attribute__((aligned(8))) gdt;
 void *global_mem_start = nullptr;
 unsigned global_mem_size = 0;
 
@@ -27,15 +27,17 @@ void initialize_segmentation()
     // segment.set_priviledge_level(0);
     // segment.set_type(segment_type::read_write_expand_down);
 
+    gdt.initialize();
+
     cpu::set_gdtr(&gdt,3);
 
     // Setup registers.
     // cpu::set_cs(1, false, 0);
-    // cpu::set_ds(1, false, 0);
-    // cpu::set_es(1, false, 0);
-    // cpu::set_fs(2, false, 0);
+    cpu::set_ds(2, false, 0);
+    cpu::set_es(2, false, 0);
+    cpu::set_fs(2, false, 0);
     cpu::set_gs(2, false, 0);
-    // cpu::set_ss(1, false, 0);
+    cpu::set_ss(2, false, 0);
 }
 
 void initialize_paging()
