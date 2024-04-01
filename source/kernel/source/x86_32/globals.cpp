@@ -32,7 +32,7 @@ void initialize_segmentation()
     cpu::set_gdtr(&gdt,3);
 
     // Setup registers.
-    // cpu::set_cs(1, false, 0);
+    // cpu::set_cs(1 /*, false, 0 */);
     cpu::set_ds(2, false, 0);
     cpu::set_es(2, false, 0);
     cpu::set_fs(2, false, 0);
