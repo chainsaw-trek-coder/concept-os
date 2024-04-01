@@ -55,20 +55,20 @@ enum segment_type
     We're going to default present to true as well.
 
 */
-struct segment_descriptor
+struct __attribute__((packed)) segment_descriptor
 {
-    unsigned dword1;
     unsigned dword2;
+    unsigned dword1;
 
     segment_descriptor();
 
     void set_type(segment_type type);
 
-    void set_base_address(void* address);
+    void set_base_address(void *address);
 
     void set_limit(size_t limit);
 
-    void set_granularity_flag(); // When set, segment size can range from 4 KB to 4 Gigs.
+    void set_granularity_flag();   // When set, segment size can range from 4 KB to 4 Gigs.
     void clear_granularity_flag(); // When cleared, segment size can range from 1 byte to 1 MB.
 
     void set_present(bool is_present); // Sets whether or not the segment is currently in memory.
@@ -85,13 +85,13 @@ struct global_descriptor_table
     segment_descriptor segments[array_size];
 };
 
-struct flat_global_descriptor_table
+struct __attribute__((packed)) flat_global_descriptor_table
 {
     segment_descriptor null_segment; // Null descriptor is never used.
     segment_descriptor code_segment;
     segment_descriptor data_segment;
 
-    flat_global_descriptor_table(void* base, size_t size_in_bytes);
+    void initialize();
 };
 
 #endif

@@ -15,8 +15,8 @@
 
 #if defined(__i386__)
 #include "x86_32/multiboot.h"
+#include "x86_32/globals.hpp"
 #include "x86_32/cpu.h"
-#include "memory/x86_32/gdt.hpp"
 #endif
 
 #if defined(__x86_64__)
@@ -24,7 +24,6 @@
 #endif
 
 #include "terminal.h"
-#include "memory/memory.h"
 
 // Doesn't work in protected mode...
 // void get_physical_memory(short *low_mem, short *high_mem)
@@ -134,30 +133,52 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
 
-		terminal_writestring("Constructing GDT...\n");
+		terminal_writestring("Setting up memory...\n");
+		initialize_memory();
+		terminal_writestring("Finished setting up memory...\n");
 
-		// Setup gdt.
-		auto &segment = gdt.segments[0];
-		segment.set_base_address(nullptr);
-		segment.clear_granularity_flag(); // Byte sizes
-		segment.set_is_system(true);
-		segment.set_limit(reinterpret_cast<size_t>(global_mem_start) + global_mem_size);
-		segment.set_present(true);
-		segment.set_priviledge_level(0);
-		segment.set_type(segment_type::read_write_expand_down);
+		// Set interrupt table.
+		cpu::set_idtr(&idt, 256);
 
-		terminal_writestring("Setting up CPU...\n");
-		cpu::set_gdtr(&gdt);
+		terminal_writestring("Location of idt is ");
+		ptr_to_hex_string(&idt, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
 
-		// Setup registers.
-		cpu::set_cs(1, false, 0);
-		cpu::set_ds(1, false, 0);
-		cpu::set_es(1, false, 0);
-		cpu::set_fs(1, false, 0);
-		cpu::set_gs(1, false, 0);
-		cpu::set_ss(1, false, 0);
+		terminal_writestring("Location of GDT is ");
+		ptr_to_hex_string(&gdt, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
 
-		terminal_writestring("Finished setting up CPU...\n");
+		terminal_writestring("End of kernel is ");
+		ptr_to_hex_string(reinterpret_cast<void *>(end_of_kernel), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Data segment dword1: ");
+		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword1), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Data segment dword2: ");
+		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword2), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		auto old_gdt = reinterpret_cast<global_descriptor_table<26>*>(0x000cb2b4);
+		
+		terminal_writestring("Data segment dword1 for old gdt (1): ");
+		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword1), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		terminal_writestring("Data segment dword2 for old gdt (1): ");
+		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword2), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
+		// TODO: Setup kernel page directory.
+		// terminal_writestring("Paging has been setup.");
 	}
 	else
 	{

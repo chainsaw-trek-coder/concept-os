@@ -49,4 +49,11 @@ SECTIONS
  
 	/* The compiler may produce other sections, by default it will put them in
 	   a segment with the same name. Simply add stuff here as needed. */
+
+	
+	.end_of_kernel :
+	{
+		KEEP(*(.end_of_kernel));
+		_end_of_kernel = .;
+	} 
 }
