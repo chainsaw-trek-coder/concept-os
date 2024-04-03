@@ -1,6 +1,9 @@
 #include "memory/x86_32/gdt.hpp"
 #include "interrupts/x86_32/idt.hpp"
 
+// TODO: Convert the assembly here into Intel syntax.
+//       It's easier to read and matches Intel documentation.
+
 struct cpu
 {
     // Segmentation registers
@@ -118,7 +121,7 @@ inline void cpu::enable_paging()
 {
     asm volatile(
         "mov %%cr0, %%eax\n"
-        "or %%eax, 0x80000000\n"
+        "or $0x80000000, %%eax\n"
         "mov %%eax, %%cr0\n"
         :
         :);
