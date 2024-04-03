@@ -1,6 +1,9 @@
 #include "memory/x86_32/gdt.hpp"
 #include "interrupts/x86_32/idt.hpp"
 
+// TODO: Convert the assembly here into Intel syntax.
+//       It's easier to read and matches Intel documentation.
+
 struct cpu
 {
     // Segmentation registers
