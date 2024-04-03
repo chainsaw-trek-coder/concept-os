@@ -118,7 +118,7 @@ inline void cpu::enable_paging()
 {
     asm volatile(
         "mov %%cr0, %%eax\n"
-        "or %%eax, 0x80000000\n"
+        "or $0x80000000, %%eax\n"
         "mov %%eax, %%cr0\n"
         :
         :);
