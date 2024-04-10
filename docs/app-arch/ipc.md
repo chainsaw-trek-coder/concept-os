@@ -35,11 +35,10 @@ The first call workflow involves:
 Messages start with a header the number of parameters, offsets into the block of memory for each parameter
 paired with the size of the parameter. This is followed by the values for the parameters.
 
- -------------------------------------------------------------------------------------------------------------
-| Number of parameter | Parameter offset 1 | Parameter size 1  | Parameter offset 2 | Parameter size 2 | ...  |
- -------------------------------------------------------------------------------------------------------------
-| Parameter value 1   | Parameter value 2 | ...                                                               | 
- -------------------------------------------------------------------------------------------------------------
+| -                    | -                  | -                 | -                   | -                  | -   |
+| -------------------- | ------------------ | ------------------| ------------------- | ------------------ | --- |
+| Number of parameters | Parameter offset 1 | Parameter size 1  | Parameter offset 2  | Parameter size 2   | ... |
+| Parameter value 1    | Parameter value 2  | ...               | ...                 | ...                | ... |
 
 Offsets can have 3 states:
 1. If offset is greater than 0, the parameter is set.
