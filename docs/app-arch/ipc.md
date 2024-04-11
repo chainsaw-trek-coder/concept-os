@@ -29,3 +29,24 @@ The first call workflow involves:
 24. Caller instructs the OS that it is done with the return message.
 25. Caller instructs the OS that it is done with the caller's shared memory block.
 26. OS releases return shared memory block to pool of shared memory blocks.
+
+# IPC Message
+
+Messages start with a header the number of parameters, offsets into the block of memory for each parameter
+paired with the size of the parameter. This is followed by the values for the parameters.
+
+| -                    | -                  | -                 | -                   | -                  | -   |
+| -------------------- | ------------------ | ------------------| ------------------- | ------------------ | --- |
+| Number of parameters | Parameter offset 1 | Parameter size 1  | Parameter offset 2  | Parameter size 2   | ... |
+| Parameter value 1    | Parameter value 2  | ...               | ...                 | ...                | ... |
+
+Offsets can have 3 states:
+1. If offset is greater than 0, the parameter is set.
+2. If the offset is 0, the parameter is determined to be null.
+
+The intent of this scheme is to make it easy to fill structure quickly and to read it quickly.
+
+When constructing the message, the client:
+
+1. Initializes the header with the number of parameters, followed by zero's for offsets/sizes.
+2. As parameters are set the values are stored after the header and the correct offset/size of that value is set.
