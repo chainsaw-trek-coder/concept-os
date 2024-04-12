@@ -1,16 +1,13 @@
 #include "ipc/os_message.hpp"
 
-os::ipc::os_message::os_message(os::memory::shared_ptr<os_message_descriptor> &descriptor)
-    : descriptor(descriptor)
+os::ipc::os_message::os_message(unsigned num_of_parameters)
 {
     // TODO: Request shared memory object from OS.
 
     // TODO: Initialize shared memory object with the number of parameters
     //       as well as an array of offsets of size equal to the number of
     //       parameters.
-
-    auto initialization_array = descriptor.value().get_message_initization_array();
-
+    
     // Copy initialization array into shared memory segment.
 }
 
