@@ -6,6 +6,12 @@ namespace os::ipc
     class os_message
     {
     private:
+        struct field
+        {
+            unsigend offset;
+            size_t size;
+        };
+
         void *shared_mem;
         size_t shared_mem_size;
         os::memory::shared_ptr<os_message_descriptor> descriptor;
