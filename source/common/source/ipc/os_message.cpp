@@ -1,14 +1,23 @@
 #include "ipc/os_message.hpp"
 
-os::ipc::os_message::os_message(unsigned num_of_parameters)
+os::ipc::os_message::os_message(unsigned num_of_parameters, void* shared_mem, size_t shared_mem_size);
 {
-    // TODO: Request shared memory object from OS.
-
+    auto num_of_parameters_ptr = reinterpret_cast<unsigned*>(shared_mem);
+    
+    *num_of_parameters_ptr = num_of_parameters;
+        
     // TODO: Initialize shared memory object with the number of parameters
     //       as well as an array of offsets of size equal to the number of
     //       parameters.
     
     // Copy initialization array into shared memory segment.
+}
+
+os::ipc::os_message::os_message(unsigned num_of_parameters)
+{
+    // TODO: Request shared memory object from OS.
+
+    // TODO: Call this constructor
 }
 
 os::ipc::os_message::~os_message()
