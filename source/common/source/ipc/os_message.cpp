@@ -5,12 +5,14 @@ os::ipc::os_message::os_message(unsigned num_of_parameters, void* shared_mem, si
     auto num_of_parameters_ptr = reinterpret_cast<unsigned*>(shared_mem);
     
     *num_of_parameters_ptr = num_of_parameters;
-        
-    // TODO: Initialize shared memory object with the number of parameters
-    //       as well as an array of offsets of size equal to the number of
-    //       parameters.
-    
-    // Copy initialization array into shared memory segment.
+
+    auto fields = reinterpret_cast<field*>(num_of_parameters_ptr + 1);
+
+    for(unsigned i = 0; i < num_of_parameters; i++)
+    {
+        fields[i].offset = 0;
+        fields[i].size = 0;
+    }
 }
 
 os::ipc::os_message::os_message(unsigned num_of_parameters)
