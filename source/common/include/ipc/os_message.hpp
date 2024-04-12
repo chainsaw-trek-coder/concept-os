@@ -6,9 +6,12 @@ namespace os::ipc
     class os_message
     {
     private:
+        void *shared_mem;
+        size_t shared_mem_size;
         os::memory::shared_ptr<os_message_descriptor> descriptor;
 
     public:
+        os_message(unsigned num_of_parameters, void* shared_mem, size_t shared_mem_size);
         os_message(unsigned num_of_parameters);
         ~os_message();
 
