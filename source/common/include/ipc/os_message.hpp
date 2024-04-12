@@ -9,7 +9,7 @@ namespace os::ipc
         os::memory::shared_ptr<os_message_descriptor> descriptor;
 
     public:
-        os_message(os::memory::shared_ptr<os_message_descriptor> &descriptor);
+        os_message(unsigned num_of_parameters);
         ~os_message();
 
         unsigned get_value_offset(char *name);
