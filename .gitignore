@@ -6,3 +6,4 @@ helloworld/isodir/**
 *.pid
 
 build/kernel/**
+build/common/**

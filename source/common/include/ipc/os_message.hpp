@@ -1,5 +1,3 @@
-#include "memory/shared_ptr.hpp"
-
 namespace os::ipc
 {
     class os_message
@@ -20,7 +18,6 @@ namespace os::ipc
         field *fields;
         unsigned end_of_params;
         field &get_field(unsigned offset);
-        os::memory::shared_ptr<os_message_descriptor> descriptor;
 
     public:
         os_message(unsigned num_of_parameters, void *shared_mem, size_t shared_mem_size);
@@ -29,7 +26,7 @@ namespace os::ipc
 
         unsigned get_value_offset(char *name);
 
-        void set_value(unsigned offset, char *value, size_t value_size);
+        void set_value(unsigned offset, const char *value, size_t value_size);
         size_t get_value_size(unsigned offset);
         void *get_value(unsigned offset);
 
@@ -38,12 +35,13 @@ namespace os::ipc
         void *get_value(char *name);
     };
 
-    inline field &os_message::get_field(unsigned offset)
+    inline os_message::field &os_message::get_field(unsigned offset)
     {
-        return fields[i];
+        return fields[offset];
     }
 
     inline os_message::os_message(unsigned num_of_parameters, void *shared_mem, size_t shared_mem_size)
+        : shared_mem(shared_mem), shared_mem_size(shared_mem_size)
     {
         num_of_parameters_ptr = reinterpret_cast<unsigned *>(shared_mem);
         *num_of_parameters_ptr = num_of_parameters;
@@ -56,7 +54,7 @@ namespace os::ipc
             fields[i].size = 0;
         }
 
-        end_of_params = &fields[num_of_parameters];
+        end_of_params = sizeof(num_of_parameters) + (sizeof(field) * num_of_parameters);
     }
 
     inline os_message::os_message(unsigned num_of_parameters)
@@ -76,7 +74,7 @@ namespace os::ipc
         return 0;
     }
 
-    inline void os_message::set_value(unsigned offset, char *value, size_t value_size)
+    inline void os_message::set_value(unsigned offset, const char *value, size_t value_size)
     {
         auto &field = get_field(offset);
 
@@ -87,7 +85,7 @@ namespace os::ipc
 
         auto dest = reinterpret_cast<char*>(shared_mem) + end_of_params;
 
-        for(unsigned i = 0; < value_size; i++)
+        for(unsigned i = 0; i < value_size; i++)
             dest[i] = value[i];
 
         end_of_params += value_size;

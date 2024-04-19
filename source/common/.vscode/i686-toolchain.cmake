@@ -1,0 +1,13 @@
+set(CMAKE_ASM-ATT_COMPILER /home/vscode/opt/cross/bin/i686-elf-as)
+set(CMAKE_C_COMPILER   /home/vscode/opt/cross/bin/i686-elf-gcc)
+set(CMAKE_CXX_COMPILER /home/vscode/opt/cross/bin/i686-elf-g++)
+set(CMAKE_FIND_ROOT_PATH /home/vscode/opt/cross/bin/)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+set(CMAKE_C_FLAGS "-ffreestanding -nostdlib")
+set(CMAKE_CXX_FLAGS "-ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti")
+SET(CMAKE_EXE_LINKER_FLAGS "-ffreestanding -O2 -nostdlib")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
