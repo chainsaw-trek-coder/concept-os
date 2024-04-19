@@ -26,9 +26,9 @@ namespace os::ipc
 
         unsigned get_value_offset(char *name);
 
-        void set_value(unsigned offset, const char *value, size_t value_size);
-        size_t get_value_size(unsigned offset);
-        void *get_value(unsigned offset);
+        void set_value(int offset, const char *value, size_t value_size);
+        size_t get_value_size(int offset);
+        void *get_value(int offset);
 
         void set_value(char *name, char *value, size_t value_size);
         size_t get_value_size(char *name);
@@ -74,7 +74,7 @@ namespace os::ipc
         return 0;
     }
 
-    inline void os_message::set_value(unsigned offset, const char *value, size_t value_size)
+    inline void os_message::set_value(int offset, const char *value, size_t value_size)
     {
         auto &field = get_field(offset);
 
@@ -91,12 +91,12 @@ namespace os::ipc
         end_of_params += value_size;
     }
 
-    inline size_t os_message::get_value_size(unsigned offset)
+    inline size_t os_message::get_value_size(int offset)
     {
         return get_field(offset).size;
     }
 
-    void *os::ipc::os_message::get_value(unsigned offset)
+    void *os::ipc::os_message::get_value(int offset)
     {
         return reinterpret_cast<void*>(reinterpret_cast<char*>(shared_mem) + get_field(offset).offset);
     }
