@@ -45,3 +45,5 @@ So far the functions listed above do not appear to need one.
 
 If we need to have a top level record of all page tables, this should be a linked list of 4k nodes.
 Maybe this could store process information.
+
+<b>Proposal:</b> Have separate free trees per processor to reduce contention. Allow migration of free blocks between processors as needed.
