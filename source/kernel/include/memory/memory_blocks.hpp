@@ -43,7 +43,7 @@ private:
     void add_node_to_tree(free_block *block);
 };
 
-inline memory_blocks::number_of_blocks(unsigned size_in_blocks)
+inline unsigned memory_blocks::number_of_blocks(unsigned size_in_bytes)
 {
     return (size_in_bytes / 4096) + (size_in_bytes % 4096 > 0 ? 1 : 0);    
 }

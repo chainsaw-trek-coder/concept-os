@@ -6,7 +6,7 @@ void memory_blocks::initialize(void *address, unsigned size)
     this->size = size;
 
     free_blocks[0].size = size;
-    free_blocks[0].predecessor_by_size nullptr;
+    free_blocks[0].predecessor_by_size = nullptr;
     free_blocks[0].smaller_block = nullptr;
     free_blocks[0].larger_block = nullptr;
 
@@ -58,7 +58,7 @@ void memory_blocks::remove_node_from_tree(free_block *block)
     successor->larger_block = block->larger_block;
 
     if (block->predecessor_by_size == nullptr)
-        free_blocks = sucessor;
+        free_blocks = successor;
     else if (block->predecessor_by_size->smaller_block == block)
         block->predecessor_by_size->smaller_block = successor;
     else if (block->predecessor_by_size->larger_block == block)
@@ -166,7 +166,7 @@ void *memory_blocks::allocate(unsigned size_in_bytes)
         new_block.lower_block = nullptr;
         new_block.higher_block = nullptr;
 
-        add_node_to_tree(new_block);
+        add_node_to_tree(&new_block);
     }
 
     // Return newly allocated block.
