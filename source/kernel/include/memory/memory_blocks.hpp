@@ -2,6 +2,8 @@ struct free_block
 {
     unsigned size;
 
+    free_block *predecessor_by_size;
+
     free_block *smaller_block;
     free_block *larger_block;
 
@@ -33,6 +35,10 @@ struct memory_blocks
     /// @brief Deallocate a block.
     /// @param address Address of block to deallocate.
     void deallocate(void *address);
+
+private:
+
+    void remove_node_from_tree(free_block *block);
 
 };
 
