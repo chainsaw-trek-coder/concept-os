@@ -204,8 +204,20 @@ void *memory_blocks::allocate_next_to(void *address, unsigned size_in_bytes)
 void memory_blocks::deallocate(void *address)
 {
     // Setup block as a free data structure.
+    auto new_block = reinterpret_cast<free_block*>(address);
+    new_block->predecessor_by_size = nullptr;
+    new_block->predecessor_by_address = nullptr;
+    new_block->smaller_block = nullptr;
+    new_block->larger_block = nullptr;
+    new_block->lower_block = nullptr;
+    new_block->higher_block = nullptr;
+    
+    new_block->size = 4096;
 
-    // Look for spot on tree to add it to.
+    add_node_to_tree(new_block);
+    size += 4096;
+
+    // TODO: Finish structuring tree by address so that merging is possible.
 
     // Merge into adjacent block if possible.
 }

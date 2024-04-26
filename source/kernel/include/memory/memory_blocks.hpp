@@ -1,4 +1,4 @@
-struct free_block
+struct __attribute__((packed)) free_block
 {
     unsigned size;
 
