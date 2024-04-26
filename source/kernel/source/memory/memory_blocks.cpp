@@ -14,26 +14,38 @@ void memory_blocks::initialize(void *address, unsigned size)
     free_blocks[0].higher_block = nullptr;
 }
 
+void memory_blocks::replace_block_at_its_predecessor_by_size(free_block *old_block, free_block *new_block)
+{
+    if (old_block->predecessor_by_size == nullptr)
+        free_blocks = new_block;
+    else if (old_block->predecessor_by_size->smaller_block == old_block)
+        old_block->predecessor_by_size->smaller_block = new_block;
+    else if (old_block->predecessor_by_size->larger_block == old_block)
+        old_block->predecessor_by_size->larger_block = new_block;
+}
+
 void memory_blocks::remove_node_from_tree(free_block *block)
 {
     // No successors
     if (block->smaller_block == nullptr && block->larger_block == nullptr)
     {
-        free_blocks = nullptr;
+        replace_block_at_its_predecessor_by_size(block, nullptr);
         return;
     }
 
     // One successor - part 1.
     if (block->smaller_block == nullptr && block->larger_block != nullptr)
     {
-        free_blocks = block->larger_block;
+        block->larger_block->predecessor_by_size = block->predecessor_by_size;
+        replace_block_at_its_predecessor_by_size(block, block->larger_block);        
         return;
     }
 
     // One successor - part 2.
     if (block->larger_block == nullptr && block->smaller_block != nullptr)
     {
-        free_blocks = block->smaller_block;
+        block->smaller_block->predecessor_by_size = block->predecessor_by_size;
+        replace_block_at_its_predecessor_by_size(block, block->smaller_block);
         return;
     }
 
@@ -53,16 +65,15 @@ void memory_blocks::remove_node_from_tree(free_block *block)
     successor->predecessor_by_size = nullptr;
 
     // Link it in the same way block is linked.
-    successor->predecessor_by_size = block->predecessor_by_size;
-    successor->smaller_block = block->smaller_block;
-    successor->larger_block = block->larger_block;
+    replace_block_at_its_predecessor_by_size(block, successor);
 
-    if (block->predecessor_by_size == nullptr)
-        free_blocks = successor;
-    else if (block->predecessor_by_size->smaller_block == block)
-        block->predecessor_by_size->smaller_block = successor;
-    else if (block->predecessor_by_size->larger_block == block)
-        block->predecessor_by_size->larger_block = successor;
+    successor->predecessor_by_size = block->predecessor_by_size;
+    
+    if(block->smaller_block != successor)
+        successor->smaller_block = block->smaller_block;
+    
+    if(block->larger_block != successor)
+        successor->larger_block = block->larger_block; // Given the algorithm probably should never happen.
 
     if (block->larger_block != nullptr)
         block->larger_block->predecessor_by_size = successor;
@@ -99,10 +110,10 @@ void memory_blocks::add_node_to_tree(free_block *block)
             }
         }
 
-        if(block->size > current->size)
+        if (block->size > current->size)
         {
             // Block should go right.
-            if(current->larger_block != nullptr)
+            if (current->larger_block != nullptr)
             {
                 current = current->larger_block;
                 continue;

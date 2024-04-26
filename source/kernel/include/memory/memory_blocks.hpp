@@ -39,6 +39,7 @@ struct memory_blocks
 private:
 
     unsigned number_of_blocks(unsigned size_in_bytes);
+    void replace_block_at_its_predecessor_by_size(free_block *old_block, free_block *new_block);
     void remove_node_from_tree(free_block *block);
     void add_node_to_tree(free_block *block);
 };
