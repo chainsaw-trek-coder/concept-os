@@ -21,6 +21,11 @@ TEST(MemoryTests, blocks_can_initialize_free_blocks)
     EXPECT_EQ(first_free_block->larger_block, nullptr);
 }
 
+TEST(MemoryTests, free_blocks_are_4096_bytes)
+{
+    EXPECT_EQ(sizeof(free_block), 4096);
+}
+
 TEST(MemoryTests, blocks_can_allocate_a_block)
 {
     auto initial_size = 4096*16;

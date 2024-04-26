@@ -3,12 +3,16 @@ struct free_block
     unsigned size;
 
     free_block *predecessor_by_size;
+    free_block *predecessor_by_address;
 
     free_block *smaller_block;
     free_block *larger_block;
 
     free_block *lower_block;
     free_block *higher_block;
+
+private:
+    unsigned char padding[4096-28];
 };
 
 struct memory_blocks
