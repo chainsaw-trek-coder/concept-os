@@ -213,7 +213,6 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
         EXPECT_EQ(_memory_blocks.free_blocks->smaller_block->larger_block->larger_block, nullptr);
     }
 
-
     allocated_block_2 = _memory_blocks.allocate(4096);
     /* Tree should look like this...
 
@@ -223,6 +222,12 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
         1 block
 
     */
+    EXPECT_EQ(_memory_blocks.free_blocks->size, 4096 * 13);
+    EXPECT_EQ(_memory_blocks.free_blocks->larger_block, nullptr);
+    EXPECT_NE(_memory_blocks.free_blocks->smaller_block, nullptr);
+    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block->size, 4096 * 1);
+    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block->smaller_block, nullptr);
+    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block->larger_block, nullptr);
 
     _memory_blocks.deallocate(allocated_block_2);
     /* Tree should look like this...
