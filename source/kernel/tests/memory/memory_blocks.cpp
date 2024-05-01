@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include "memory/memory_blocks.hpp"
 #include <algorithm>
+#include <random>
 #include <vector>
+#include <iostream>
 
 void validate_free_blocks(free_block *root, std::vector<free_block *> &visited, unsigned &free_size)
 {
@@ -137,7 +139,7 @@ TEST(MemoryTests, blocks_can_deallocate_a_block)
     EXPECT_EQ(_memory_blocks.free_blocks->larger_block, nullptr);
 }
 
-TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
+TEST(MemoryTests, blocks_can_simply_allocate_and_deallocate)
 {
     auto initial_size = 4096 * 16;
     unsigned char memory[initial_size];
@@ -181,4 +183,67 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
 
     _memory_blocks.deallocate(allocated_block_1);
     validate_free_blocks(_memory_blocks.free_blocks, 4096 * 16);
+}
+
+TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
+{
+    auto num_blocks = 16;
+    auto initial_size = 4096 * num_blocks;
+    unsigned char memory[initial_size];
+
+    for (unsigned i = 0; i < 4096 * num_blocks; i++)
+        memory[i] = static_cast<unsigned char>(0xFF);
+
+    memory_blocks _memory_blocks;
+    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    // Tree is one big block.
+
+    std::vector<void *> blocks;
+
+    std::random_device random("f3604415-e89f-416b-a80f-9a48fe2a8337");
+    std::uniform_int_distribution<int> operation_dist(0, 1);
+    std::uniform_int_distribution<int> deallocate_dist(0, num_blocks);
+
+    unsigned blocks_allocated = 0;
+
+    for (auto i = 0; i < 100; i++)
+    {
+        auto operation = operation_dist(random);
+
+        switch (operation)
+        {
+        // Allocate
+        case 0:
+            if (blocks_allocated < 16)
+            {
+                std::cout << "Allocating block..." << endl;
+                blocks.push_back(_memory_blocks.allocate(4096));                
+                blocks_allocated++;
+                validate_free_blocks(_memory_blocks.free_blocks, (num_blocks - blocks_allocated) * 4096);
+            }
+            else
+            {
+                std::cout << "Allocated block while out of memory..." << endl;
+                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
+                validate_free_blocks(_memory_blocks.free_blocks, (num_blocks - blocks_allocated) * 4096);
+            }
+            break;
+
+        // Deallocate
+        case 2:
+            if (blocks_allocated > 0)
+            {
+                std::cout << "Deallocating block..." << endl;
+                auto block_to_deallocate_position = deallocate_dist(random) % blocks.size();
+                auto block_to_deallocate = blocks[block_to_deallocate_position];
+                blocks.erase(block_to_deallocate);
+                _memory_blocks.deallocate(block_to_deallocate);
+                blocks_allocated--;
+                validate_free_blocks(_memory_blocks.free_blocks, (num_blocks - blocks_allocated) * 4096);
+            }
+
+            // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.
+            break;
+        }
+    }
 }
