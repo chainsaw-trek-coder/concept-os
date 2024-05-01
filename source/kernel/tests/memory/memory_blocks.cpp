@@ -3,40 +3,40 @@
 #include <algorithm>
 #include <vector>
 
-void validate_free_blocks(free_block *root, std::vector<free_block *> &path, unsigned &free_size)
+void validate_free_blocks(free_block *root, std::vector<free_block *> &visited, unsigned &free_size)
 {
     if (root == nullptr)
         return;
 
-    auto has_visited = std::find(path.begin(), path.end(), root) != path.end();
+    auto has_visited = std::find(visited.begin(), visited.end(), root) != visited.end();
 
     EXPECT_FALSE(has_visited);
 
-    path.push_back(root);
+    visited.push_back(root);
     free_size += root->size;
 
     if (root->smaller_block != nullptr)
     {
         EXPECT_TRUE(root->size >= root->smaller_block->size);
         EXPECT_EQ(root, root->smaller_block->predecessor_by_size);
-        validate_free_blocks(root->smaller_block, path, free_size);
+        validate_free_blocks(root->smaller_block, visited, free_size);
     }
 
     if (root->larger_block != nullptr)
     {
         EXPECT_TRUE(root->size <= root->larger_block->size);
         EXPECT_EQ(root, root->larger_block->predecessor_by_size);
-        validate_free_blocks(root->larger_block, path, free_size);
+        validate_free_blocks(root->larger_block, visited, free_size);
     }
 
-    path.pop_back();
+    // visited.pop_back();
 }
 
 void validate_free_blocks(free_block *root, unsigned expected_free_size)
 {
-    std::vector<free_block *> path;
+    std::vector<free_block *> visited;
     unsigned free_size = 0;
-    validate_free_blocks(root, path, free_size);
+    validate_free_blocks(root, visited, free_size);
 
     EXPECT_EQ(expected_free_size, free_size);
 }
