@@ -232,7 +232,7 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
             break;
 
         // Deallocate
-        case 2:
+        case 1:
             if (blocks_allocated > 0)
             {
                 cout << "Deallocating block..." << endl;
