@@ -202,7 +202,7 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
 
     vector<void *> blocks;
 
-    random_device random("f3604415-e89f-416b-a80f-9a48fe2a8337");
+    random_device random;
     uniform_int_distribution<int> operation_dist(0, 1);
     uniform_int_distribution<int> deallocate_dist(0, num_blocks);
 

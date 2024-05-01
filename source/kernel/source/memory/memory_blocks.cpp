@@ -130,6 +130,10 @@ void memory_blocks::add_node_to_tree(free_block *block)
 
 void *memory_blocks::allocate(unsigned size_in_bytes)
 {
+    // No more memory...
+    if(free_blocks == nullptr)
+        return nullptr;
+
     // Find suitable block.
     auto current_block = free_blocks;
 
