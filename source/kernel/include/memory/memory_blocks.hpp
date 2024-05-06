@@ -12,12 +12,13 @@ struct __attribute__((packed)) free_block
     free_block *higher_block;
 
 private:
-    unsigned char padding[4096-28];
+    unsigned char padding[4096 - 28];
 };
 
 struct memory_blocks
 {
     free_block *free_blocks;
+    free_block *free_blocks_by_address;
     unsigned size;
 
     /// @brief Set starting address and size of total available memory.
@@ -41,16 +42,20 @@ struct memory_blocks
     void deallocate(void *address);
 
 private:
-
     unsigned number_of_blocks(unsigned size_in_bytes);
     void replace_block_at_its_predecessor_by_size(free_block *old_block, free_block *new_block);
+    void replace_block_at_its_predecessor_by_address(free_block *old_block, free_block *new_block);
     void remove_node_from_tree(free_block *block);
+    void remove_node_from_tree_by_size(free_block *block);
+    void remove_node_from_tree_by_address(free_block *block);
     void add_node_to_tree(free_block *block);
+    void add_node_to_tree_by_size(free_block *block);
+    void add_node_to_tree_by_address(free_block *block);
 };
 
 inline unsigned memory_blocks::number_of_blocks(unsigned size_in_bytes)
 {
-    return (size_in_bytes / 4096) + (size_in_bytes % 4096 > 0 ? 1 : 0);    
+    return (size_in_bytes / 4096) + (size_in_bytes % 4096 > 0 ? 1 : 0);
 }
 
 extern memory_blocks system_memory_blocks;

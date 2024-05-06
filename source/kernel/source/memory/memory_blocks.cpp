@@ -3,10 +3,13 @@
 void memory_blocks::initialize(void *address, unsigned size)
 {
     free_blocks = reinterpret_cast<free_block *>(address);
+    free_blocks_by_address = reinterpret_cast<free_block *>(address);
+
     this->size = size;
 
     free_blocks[0].size = size;
     free_blocks[0].predecessor_by_size = nullptr;
+    free_blocks[0].predecessor_by_address = nullptr;
     free_blocks[0].smaller_block = nullptr;
     free_blocks[0].larger_block = nullptr;
 
@@ -24,7 +27,23 @@ void memory_blocks::replace_block_at_its_predecessor_by_size(free_block *old_blo
         old_block->predecessor_by_size->larger_block = new_block;
 }
 
+void memory_blocks::replace_block_at_its_predecessor_by_address(free_block *old_block, free_block *new_block)
+{
+    if (old_block->predecessor_by_address == nullptr)
+        free_blocks_by_address = new_block;
+    else if (old_block->predecessor_by_address->lower_block == old_block)
+        old_block->predecessor_by_address->lower_block = new_block;
+    else if (old_block->predecessor_by_address->higher_block == old_block)
+        old_block->predecessor_by_address->higher_block = new_block;
+}
+
 void memory_blocks::remove_node_from_tree(free_block *block)
+{
+    remove_node_from_tree_by_size(block);
+    remove_node_from_tree_by_address(block);
+}
+
+void memory_blocks::remove_node_from_tree_by_size(free_block *block)
 {
     // No successors
     if (block->smaller_block == nullptr && block->larger_block == nullptr)
@@ -82,7 +101,71 @@ void memory_blocks::remove_node_from_tree(free_block *block)
         block->smaller_block->predecessor_by_size = successor;
 }
 
+void memory_blocks::remove_node_from_tree_by_address(free_block *block)
+{
+    // No successors
+    if (block->lower_block == nullptr && block->higher_block == nullptr)
+    {
+        replace_block_at_its_predecessor_by_address(block, nullptr);
+        return;
+    }
+
+    // One successor - part 1.
+    if (block->lower_block == nullptr && block->higher_block != nullptr)
+    {
+        block->higher_block->predecessor_by_address = block->predecessor_by_address;
+        replace_block_at_its_predecessor_by_address(block, block->higher_block);        
+        return;
+    }
+
+    // One successor - part 2.
+    if (block->higher_block == nullptr && block->lower_block != nullptr)
+    {
+        block->lower_block->predecessor_by_address = block->predecessor_by_address;
+        replace_block_at_its_predecessor_by_address(block, block->lower_block);
+        return;
+    }
+
+    // Multiple successors.
+
+    // Find in-order successor...
+    auto successor = block;
+
+    successor = successor->higher_block;
+    while (successor->lower_block != nullptr)
+        successor = successor->lower_block;
+
+    // Make sure to remove block from tree.
+    if (successor->higher_block != nullptr)
+        successor->predecessor_by_address->lower_block = successor->higher_block;
+
+    successor->predecessor_by_address = nullptr;
+
+    // Link it in the same way block is linked.
+    replace_block_at_its_predecessor_by_address(block, successor);
+
+    successor->predecessor_by_address = block->predecessor_by_address;
+    
+    if(block->lower_block != successor)
+        successor->lower_block = block->lower_block;
+    
+    if(block->higher_block != successor)
+        successor->higher_block = block->higher_block; // Given the algorithm probably should never happen.
+
+    if (block->higher_block != nullptr)
+        block->higher_block->predecessor_by_address = successor;
+
+    if (block->lower_block != nullptr)
+        block->lower_block->predecessor_by_address = successor;
+}
+
 void memory_blocks::add_node_to_tree(free_block *block)
+{
+    add_node_to_tree_by_size(block);
+    add_node_to_tree_by_address(block);
+}
+
+void memory_blocks::add_node_to_tree_by_size(free_block *block)
 {
     if (free_blocks == nullptr)
     {
@@ -124,6 +207,58 @@ void memory_blocks::add_node_to_tree(free_block *block)
                 block->predecessor_by_size = current;
                 break;
             }
+        }
+    }
+}
+
+void memory_blocks::add_node_to_tree_by_address(free_block *block)
+{
+    if (free_blocks_by_address == nullptr)
+    {
+        free_blocks_by_address = block;
+        return;
+    }
+
+    auto current = free_blocks_by_address;
+
+    while (true)
+    {
+        if (block < current)
+        {
+            // Block should go left.
+            if (current->lower_block != nullptr)
+            {
+                current = current->lower_block;
+                continue;
+            }
+            else
+            {
+                current->lower_block = block;
+                block->predecessor_by_address = current;
+                break;
+            }
+        }
+
+        if (block > current)
+        {
+            // Block should go right.
+            if (current->higher_block != nullptr)
+            {
+                current = current->higher_block;
+                continue;
+            }
+            else
+            {
+                current->higher_block = block;
+                block->predecessor_by_address = current;
+                break;
+            }
+        }
+
+        if(block == current)
+        {
+            // What are we doing here. Block is already on the tree.
+            break;
         }
     }
 }
@@ -176,6 +311,7 @@ void *memory_blocks::allocate(unsigned size_in_bytes)
         auto &new_block = *reinterpret_cast<free_block *>((reinterpret_cast<char *>(current_block) + (blocks_needed * 4096)));
         new_block.size = new_size;
         new_block.predecessor_by_size = nullptr;
+        new_block.predecessor_by_address = nullptr;
         new_block.smaller_block = nullptr;
         new_block.larger_block = nullptr;
         new_block.lower_block = nullptr;
