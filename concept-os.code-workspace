@@ -34,6 +34,7 @@
             "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
         ],
         "C_Cpp.default.intelliSenseMode": "gcc-x86",
-        "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++"
+        "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++",
+        "cmake.buildDirectory": ""
     }
 }
