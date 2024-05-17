@@ -52,121 +52,52 @@ void memory_blocks::remove_node_from_tree(free_block *block)
 
 void memory_blocks::remove_node_from_tree_by_size(free_block *block)
 {
-    // No successors
-    if (block->smaller_block == nullptr && block->larger_block == nullptr)
-    {
-        replace_block_at_its_predecessor_by_size(block, nullptr);
-        return;
-    }
+    // Left node goes up...
 
-    // One successor - part 1.
-    if (block->smaller_block == nullptr && block->larger_block != nullptr)
-    {
-        block->larger_block->predecessor_by_size = block->predecessor_by_size;
-        replace_block_at_its_predecessor_by_size(block, block->larger_block);
-        return;
-    }
+    if(block->predecessor_by_size)
+        block->predecessor_by_size->smaller_block = block->smaller_block;
+    else
+        this->free_blocks = block->smaller_block;
 
-    // One successor - part 2.
-    if (block->larger_block == nullptr && block->smaller_block != nullptr)
-    {
+    if(block->smaller_block)
         block->smaller_block->predecessor_by_size = block->predecessor_by_size;
-        replace_block_at_its_predecessor_by_size(block, block->smaller_block);
-        return;
+
+    // Right node goes back onto tree somehow
+
+    if(block->larger_block)
+    {
+        block->larger_block->predecessor_by_size = nullptr;
+        add_node_to_tree_by_size(block->larger_block); // TODO: Refactor this so that this function doesn't start at the root.
     }
 
-    // Multiple successors.
-
-    // Find in-order successor...
-    auto successor = block;
-
-    successor = successor->larger_block;
-    while (successor->smaller_block != nullptr)
-        successor = successor->smaller_block;
-
-    // Make sure to remove block from tree.
-    if (successor->larger_block != nullptr)
-        successor->predecessor_by_size->smaller_block = successor->larger_block;
-
-    // Link it in the same way block is linked.
-    replace_block_at_its_predecessor_by_size(block, successor);
-
-    successor->predecessor_by_size = block->predecessor_by_size;
-
-    if (block->smaller_block != successor)
-        successor->smaller_block = block->smaller_block;
-
-    if (block->larger_block != successor)
-        successor->larger_block = block->larger_block; // Given the algorithm probably should never happen.
-
-    if (successor->larger_block != nullptr)
-        successor->larger_block->predecessor_by_size = successor;
-
-    if (successor->smaller_block != nullptr)
-        successor->smaller_block->predecessor_by_size = successor;
+    block->predecessor_by_size = nullptr;
+    block->smaller_block = nullptr;
+    block->larger_block = nullptr;
 }
 
 void memory_blocks::remove_node_from_tree_by_address(free_block *block)
 {
-    // No successors
-    if (block->lower_block == nullptr && block->higher_block == nullptr)
-    {
-        replace_block_at_its_predecessor_by_address(block, nullptr);
-        return;
-    }
+    // Left node goes up...
 
-    // One successor - part 1.
-    if (block->lower_block == nullptr && block->higher_block != nullptr)
-    {
-        block->higher_block->predecessor_by_address = block->predecessor_by_address;
-        replace_block_at_its_predecessor_by_address(block, block->higher_block);
-        return;
-    }
+    if(block->predecessor_by_address)
+        block->predecessor_by_address->lower_block = block->lower_block;
+    else
+        this->free_blocks_by_address = block->lower_block;
 
-    // One successor - part 2.
-    if (block->higher_block == nullptr && block->lower_block != nullptr)
-    {
+    if(block->lower_block)
         block->lower_block->predecessor_by_address = block->predecessor_by_address;
-        replace_block_at_its_predecessor_by_address(block, block->lower_block);
-        return;
-    }
 
-    // Multiple successors.
+    // Right node goes back onto tree somehow
 
-    // Find in-order successor...
-    auto successor = block;
-
-    successor = successor->higher_block;
-    while (successor->lower_block != nullptr)
-        successor = successor->lower_block;
-
-    // Make sure to remove block from tree.
-    if (successor->higher_block != nullptr)
+    if(block->higher_block)
     {
-        if (successor->predecessor_by_address->lower_block == successor)
-            successor->predecessor_by_address->lower_block = successor->higher_block;
-        else if (successor->predecessor_by_address->higher_block == successor)
-            successor->predecessor_by_address->higher_block = successor->higher_block;
-
-        successor->higher_block->predecessor_by_address = successor->predecessor_by_address;
+        block->higher_block->predecessor_by_address = nullptr;
+        add_node_to_tree_by_address(block->higher_block); // TODO: Refactor this so that this function doesn't start at the root.
     }
 
-    // Link it in the same way block is linked.
-    replace_block_at_its_predecessor_by_address(block, successor);
-
-    successor->predecessor_by_address = block->predecessor_by_address;
-
-    if (block->lower_block != successor)
-        successor->lower_block = block->lower_block;
-
-    if (block->higher_block != successor)
-        successor->higher_block = block->higher_block; // Given the algorithm probably should never happen.
-
-    if (successor->higher_block != nullptr)
-        successor->higher_block->predecessor_by_address = successor;
-
-    if (successor->lower_block != nullptr)
-        successor->lower_block->predecessor_by_address = successor;
+    block->predecessor_by_address = nullptr;
+    block->lower_block = nullptr;
+    block->higher_block = nullptr;
 }
 
 void memory_blocks::add_node_to_tree(free_block *block)
