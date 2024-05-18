@@ -16,7 +16,7 @@ void validate_free_blocks_by_size(free_block *root, vector<free_block *> &visite
 
     EXPECT_FALSE(has_visited);
 
-    if(has_visited)
+    if (has_visited)
         return; // Don't want to get caught up in an infinite recursion.
 
     visited.push_back(root);
@@ -46,7 +46,7 @@ void validate_free_blocks_by_address(free_block *root, vector<free_block *> &vis
 
     EXPECT_FALSE(has_visited);
 
-    if(has_visited)
+    if (has_visited)
         return; // Don't want to get caught up in an infinite recursion.
 
     visited.push_back(root);
@@ -76,7 +76,7 @@ void validate_free_blocks(free_block *root, free_block *root_by_address, unsigne
     validate_free_blocks_by_size(root, visited, free_size);
 
     EXPECT_EQ(expected_free_size, free_size);
-    
+
     visited.clear();
     free_size = 0;
     validate_free_blocks_by_address(root_by_address, visited, free_size);
@@ -219,7 +219,6 @@ TEST(MemoryTests, blocks_can_simply_allocate_and_deallocate)
     allocated_block_2 = _memory_blocks.allocate(4096);
     validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 14);
 
-
     _memory_blocks.deallocate(allocated_block_2);
     validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 15);
 
@@ -256,10 +255,13 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
         {
         // Allocate
         case 0:
-            if (blocks_allocated < 16)
+            if (blocks_allocated < num_blocks)
             {
-                cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));                
+                cout << "Allocating block...";
+                auto new_block = _memory_blocks.allocate(4096);
+                cout << new_block << endl;
+                EXPECT_NE(new_block, nullptr);
+                blocks.push_back(new_block);
                 blocks_allocated++;
                 validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
@@ -274,11 +276,11 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
         // Deallocate
         case 1:
             if (blocks_allocated > 0)
-            {                
+            {
                 auto block_to_deallocate_position = deallocate_dist(random) % blocks.size();
                 auto block_to_deallocate = blocks[block_to_deallocate_position];
 
-                cout << "Deallocating block " << block_to_deallocate_position << "..." << endl;
+                cout << "Deallocating block " << block_to_deallocate_position << "..." << block_to_deallocate << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
                 _memory_blocks.deallocate(block_to_deallocate);
@@ -321,10 +323,13 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate_1thousand_times)
         {
         // Allocate
         case 0:
-            if (blocks_allocated < 16)
+            if (blocks_allocated < num_blocks)
             {
-                cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));                
+                cout << "Allocating block...";
+                auto new_block = _memory_blocks.allocate(4096);
+                cout << new_block << endl;
+                EXPECT_NE(new_block, nullptr);
+                blocks.push_back(new_block);
                 blocks_allocated++;
                 validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
@@ -339,11 +344,11 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate_1thousand_times)
         // Deallocate
         case 1:
             if (blocks_allocated > 0)
-            {                
+            {
                 auto block_to_deallocate_position = deallocate_dist(random) % blocks.size();
                 auto block_to_deallocate = blocks[block_to_deallocate_position];
 
-                cout << "Deallocating block " << block_to_deallocate_position << "..." << endl;
+                cout << "Deallocating block " << block_to_deallocate_position << "..." << block_to_deallocate << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
                 _memory_blocks.deallocate(block_to_deallocate);
@@ -372,7 +377,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
 
     vector<void *> blocks;
 
-    int operations[32] = { 1, 1, 1, 1, 1, -2, -3, 1, -2, 1, 1, -4, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, -2, -3, 0, 0, 1, -1, 1, -1 ,0 };
+    int operations[32] = {1, 1, 1, 1, 1, -2, -3, 1, -2, 1, 1, -4, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, -2, -3, 0, 0, 1, -1, 1, -1, 0};
 
     unsigned blocks_allocated = 0;
 
@@ -387,7 +392,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
             if (blocks_allocated < 16)
             {
                 cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));                
+                blocks.push_back(_memory_blocks.allocate(4096));
                 blocks_allocated++;
                 validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
@@ -402,7 +407,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
         // Deallocate
         default:
             if (blocks_allocated > 0)
-            {                
+            {
                 auto block_to_deallocate_position = operations[i] * -1;
                 auto block_to_deallocate = blocks[block_to_deallocate_position];
 
@@ -435,7 +440,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
 
     vector<void *> blocks;
 
-    int operations[27] = { 1, 1, 1, 1, 1, -1, -1, 1, 1, -3, 1, 0, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 0, -1, -3, -5, 0 };
+    int operations[27] = {1, 1, 1, 1, 1, -1, -1, 1, 1, -3, 1, 0, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 0, -1, -3, -5, 0};
 
     unsigned blocks_allocated = 0;
 
@@ -450,7 +455,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
             if (blocks_allocated < 16)
             {
                 cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));                
+                blocks.push_back(_memory_blocks.allocate(4096));
                 blocks_allocated++;
                 validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
@@ -465,7 +470,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
         // Deallocate
         default:
             if (blocks_allocated > 0)
-            {                
+            {
                 auto block_to_deallocate_position = operations[i] * -1;
                 auto block_to_deallocate = blocks[block_to_deallocate_position];
 
@@ -500,18 +505,17 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
 
     vector<int> operations = {
         1, 1, 1, -2, 1, 1, -2, 1, -1, -1, 1, -2, 0, 0, 1, 1, -1, 1, -1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0,
-        1, 0, 1, 0, 1, 1, 1, 1, 1, -3, -3, 0, 1, 1, -1, -2, 1, -2, 1, -2, 0, 1, 0, 0, 1, 1, 1, -2, 1, 1, 
+        1, 0, 1, 0, 1, 1, 1, 1, 1, -3, -3, 0, 1, 1, -1, -2, 1, -2, 1, -2, 0, 1, 0, 0, 1, 1, 1, -2, 1, 1,
         1, 1, -1, -3, 1, -3, -2, 1, -3, -2, 1, -1, 1, -2, -1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, -4, -4, 1,
-        -2, -2, -2, -1, 1, 1, -2, 1, -1, -1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, -3, -2, 1, 0, 0, 0, 
+        -2, -2, -2, -1, 1, 1, -2, 1, -1, -1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, -3, -2, 1, 0, 0, 0,
         1, 1, 1, 1, 1, -3, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, -7, -3, 1, 1, 0, -2, -1, 1, 1, 1, -8, 1, -4,
         -9, -9, -5, 1, -4, 1, -1, 1, 1, -2, 1, -6, -3, 1, 1, -1, -1, -4, 1, 1, 0, -4, 1, 1, -2, -4, -5,
-        1, 1, 1, 1, -1, 1, 0, 1, 1, -6, -7, 1, 1, -6, -8, 1, -10, 1, -5, -8, -1, 1, -3, 1, -1, 1, -2, 1, 
+        1, 1, 1, 1, -1, 1, 0, 1, 1, -6, -7, 1, 1, -6, -8, 1, -10, 1, -5, -8, -1, 1, -3, 1, -1, 1, -2, 1,
         -8, -7, 1, 1, -7, 1, 1, 1, 1, -2, -4, -1, -5, -1, 1, 0, -1, 1, 1, 0, 1, 1, 0, 1, 1, 1, -9, 1, 1,
         1, -7, -8, 1, -5, -7, -5, 1, 1, 1, 1, -7, -7, 1, -8, -10, -8, -3, 1, 1, 1, 1, 1, -7, 1, 1, -1, 1,
         -1, -1, -11, -4, 1, 1, 1, 1, -7, -1, -9, 1, 1, -1, 1, 1, -13, 1, -12, -12, 1, -1, 1, -10, -11, -1,
         1, 1, 1, 1, -3, 1, -1, 1, -7, -12, -5, 0, 1, 1, -5, -3, 1, -7, -3, -6, -6, 1, 1, 1, -1, 1, -6, -8,
-        1, -2, 1, -4, 1, 1, -4, -3, -3, -4, -4, 1, -5, 1
-    };
+        1, -2, 1, -4, 1, 1, -4, -3, -3, -4, -4, 1, -5, 1};
 
     unsigned blocks_allocated = 0;
 
@@ -525,8 +529,8 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
         case 1:
             if (blocks_allocated < 16)
             {
-                cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));                
+                cout << "Allocating block...";
+                blocks.push_back(_memory_blocks.allocate(4096));
                 blocks_allocated++;
                 validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
@@ -541,7 +545,7 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
         // Deallocate
         default:
             if (blocks_allocated > 0)
-            {                
+            {
                 auto block_to_deallocate_position = (operations[i] * -1) % blocks.size();
                 auto block_to_deallocate = blocks[block_to_deallocate_position];
 

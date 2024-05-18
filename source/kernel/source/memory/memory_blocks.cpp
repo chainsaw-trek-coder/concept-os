@@ -54,50 +54,50 @@ void memory_blocks::remove_node_from_tree_by_size(free_block *block)
 {
     // Left node goes up...
 
-    if(block->predecessor_by_size)
-        block->predecessor_by_size->smaller_block = block->smaller_block;
+    if (block->predecessor_by_size)
+        replace_block_at_its_predecessor_by_size(block, block->smaller_block);
     else
         this->free_blocks = block->smaller_block;
 
-    if(block->smaller_block)
+    if (block->smaller_block)
         block->smaller_block->predecessor_by_size = block->predecessor_by_size;
 
     // Right node goes back onto tree somehow
 
-    if(block->larger_block)
+    if (block->larger_block)
     {
         block->larger_block->predecessor_by_size = nullptr;
         add_node_to_tree_by_size(block->larger_block); // TODO: Refactor this so that this function doesn't start at the root.
     }
 
-    block->predecessor_by_size = nullptr;
-    block->smaller_block = nullptr;
-    block->larger_block = nullptr;
+    // block->predecessor_by_size = nullptr;
+    // block->smaller_block = nullptr;
+    // block->larger_block = nullptr;
 }
 
 void memory_blocks::remove_node_from_tree_by_address(free_block *block)
 {
     // Left node goes up...
 
-    if(block->predecessor_by_address)
-        block->predecessor_by_address->lower_block = block->lower_block;
+    if (block->predecessor_by_address)
+        replace_block_at_its_predecessor_by_address(block, block->lower_block);
     else
         this->free_blocks_by_address = block->lower_block;
 
-    if(block->lower_block)
+    if (block->lower_block)
         block->lower_block->predecessor_by_address = block->predecessor_by_address;
 
     // Right node goes back onto tree somehow
 
-    if(block->higher_block)
+    if (block->higher_block)
     {
         block->higher_block->predecessor_by_address = nullptr;
         add_node_to_tree_by_address(block->higher_block); // TODO: Refactor this so that this function doesn't start at the root.
     }
 
-    block->predecessor_by_address = nullptr;
-    block->lower_block = nullptr;
-    block->higher_block = nullptr;
+    // block->predecessor_by_address = nullptr;
+    // block->lower_block = nullptr;
+    // block->higher_block = nullptr;
 }
 
 void memory_blocks::add_node_to_tree(free_block *block)
@@ -112,6 +112,7 @@ void memory_blocks::add_node_to_tree_by_size(free_block *block)
     if (free_blocks == nullptr)
     {
         free_blocks = block;
+        block->predecessor_by_size = nullptr;
         return;
     }
 
@@ -158,6 +159,7 @@ void memory_blocks::add_node_to_tree_by_address(free_block *block)
     if (free_blocks_by_address == nullptr)
     {
         free_blocks_by_address = block;
+        block->predecessor_by_address = nullptr;
         return;
     }
 
@@ -176,7 +178,7 @@ void memory_blocks::add_node_to_tree_by_address(free_block *block)
             else
             {
                 current->lower_block = block;
-                block->predecessor_by_address = current;
+                current->lower_block->predecessor_by_address = current;
                 break;
             }
         }
@@ -192,7 +194,7 @@ void memory_blocks::add_node_to_tree_by_address(free_block *block)
             else
             {
                 current->higher_block = block;
-                block->predecessor_by_address = current;
+                current->higher_block->predecessor_by_address = current;
                 break;
             }
         }
@@ -241,13 +243,13 @@ void *memory_blocks::allocate(unsigned size_in_bytes)
     }
 
     remove_node_from_tree(current_block);
-
-    if (current_block->size > size_in_bytes)
+    
+    auto blocks_needed = number_of_blocks(size_in_bytes);
+    auto blocks_in_node = number_of_blocks(current_block->size);
+    
+    if (blocks_in_node > blocks_needed)
     {
         // Split block.
-        auto blocks_needed = number_of_blocks(size_in_bytes);
-        auto blocks_in_node = number_of_blocks(current_block->size);
-
         auto new_size = (blocks_in_node - blocks_needed) * 4096;
 
         auto &new_block = *reinterpret_cast<free_block *>((reinterpret_cast<char *>(current_block) + (blocks_needed * 4096)));
@@ -337,8 +339,4 @@ void memory_blocks::deallocate(void *address)
     }
 
     add_node_to_tree(new_block);
-
-    // TODO: Finish structuring tree by address so that merging is possible.
-
-    // Merge into adjacent block if possible.
 }
