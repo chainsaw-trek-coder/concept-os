@@ -13,7 +13,7 @@ extern interrupt_descriptor_table idt;
 
 extern "C" void *end_of_kernel;
 
-extern page_directory *global_page_directory;
+extern page_directory *kernel_page_directory;
 
 // Support placement new.
 inline void *operator new(size_t, void *__p)

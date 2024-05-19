@@ -42,7 +42,6 @@ struct memory_blocks
     void deallocate(void *address);
 
 private:
-    unsigned number_of_blocks(unsigned size_in_bytes);
     void replace_block_at_its_predecessor_by_size(free_block *old_block, free_block *new_block);
     void replace_block_at_its_predecessor_by_address(free_block *old_block, free_block *new_block);
     void remove_node_from_tree(free_block *block);
@@ -53,7 +52,7 @@ private:
     void add_node_to_tree_by_address(free_block *block);
 };
 
-inline unsigned memory_blocks::number_of_blocks(unsigned size_in_bytes)
+inline unsigned number_of_blocks(unsigned size_in_bytes)
 {
     return (size_in_bytes / 4096) + (size_in_bytes % 4096 > 0 ? 1 : 0);
 }
