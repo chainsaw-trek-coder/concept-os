@@ -13,7 +13,9 @@ interrupt_descriptor_table __attribute__((aligned(8))) idt;
 unsigned end_of_kernel_variable __attribute__((section(".end_of_kernel")));
 void *end_of_kernel = &end_of_kernel_variable;
 
-page_directory *global_page_directory = nullptr;
+memory_blocks memory;
+
+page_directory *kernel_page_directory = nullptr;
 
 void initialize_segmentation()
 {
@@ -43,9 +45,10 @@ void initialize_segmentation()
 void initialize_paging()
 {
     // Map kernel into pages.
-    global_page_directory = new (get_aligned_address(end_of_kernel)) page_directory();
+    kernel_page_directory = new (memory.allocate(sizeof(page_directory))) page_directory();
 
-    auto pages_needed = reinterpret_cast<unsigned>(global_page_directory) / 0x1000;
+    auto bytes_needed = reinterpret_cast<unsigned>(get_aligned_address(end_of_kernel));
+    auto pages_needed = number_of_blocks(bytes_needed);
     auto page_tables_needed = pages_needed / 1024 + (pages_needed % 1024 > 0 ? 1 : 0);
 
     // TODO: Kernel panic if tables needed is more than 1024.
@@ -53,14 +56,12 @@ void initialize_paging()
     //       to address more than 4 Gigs of memory.
 
     // Allocate page tables.
-    auto page_tables = reinterpret_cast<page_table *>(global_page_directory + 1);
-
     unsigned current_page = 0;
 
     for (size_t i = 0; i < page_tables_needed; i++)
     {
-        auto &entry = global_page_directory->entries[i];
-        entry.set_address(new (&page_tables[i]) page_table());
+        auto &entry = kernel_page_directory->entries[i];
+        entry.set_address(new (memory.allocate(sizeof(page_table))) page_table());
         entry.set_present(true);
 
         auto &table = *entry.get_address();
@@ -81,9 +82,16 @@ void initialize_paging()
 void initialize_memory()
 {
     initialize_segmentation();
+
+    auto memory_start = get_aligned_address(end_of_kernel);
+    auto memory_end = reinterpret_cast<unsigned char*>(global_mem_start) + global_mem_size;
+    auto available_memory_size = memory_end - reinterpret_cast<unsigned char*>(memory_start);
+
+    memory.initialize(memory_start, available_memory_size);
+
     initialize_paging();
 
     // Enable paging
-    cpu::set_page_directory(global_page_directory);
+    cpu::set_page_directory(kernel_page_directory);
     cpu::enable_paging();
 }

@@ -10,5 +10,6 @@
         "CMAKE_C_COMPILER_WORKS": "1",
         "CMAKE_CXX_COMPILER_WORKS": "1"
     },
-    "cmake.ignoreKitEnv": true
+    "cmake.ignoreKitEnv": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
