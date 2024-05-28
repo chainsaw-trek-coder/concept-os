@@ -21,6 +21,7 @@ namespace os::ipc
 
     public:
         os_message(unsigned num_of_parameters, void *shared_mem, size_t shared_mem_size);
+        os_message(void *shared_mem, size_t shared_mem_size);
         os_message(unsigned num_of_parameters);
         ~os_message();
 
@@ -57,6 +58,16 @@ namespace os::ipc
         end_of_params = sizeof(num_of_parameters) + (sizeof(field) * num_of_parameters);
     }
 
+    inline os_message::os_message(void *shared_mem, size_t shared_mem_size)
+        : shared_mem(shared_mem), shared_mem_size(shared_mem_size)
+    {
+        num_of_parameters_ptr = reinterpret_cast<unsigned *>(shared_mem);
+
+        fields = reinterpret_cast<field *>(num_of_parameters_ptr + 1);
+
+        end_of_params = sizeof(num_of_parameters) + (sizeof(field) * num_of_parameters);
+    }
+
     inline os_message::os_message(unsigned num_of_parameters)
     {
         // TODO: Request shared memory object from OS.
@@ -83,9 +94,9 @@ namespace os::ipc
         field.offset = end_of_params;
         field.size = value_size;
 
-        auto dest = reinterpret_cast<char*>(shared_mem) + end_of_params;
+        auto dest = reinterpret_cast<char *>(shared_mem) + end_of_params;
 
-        for(unsigned i = 0; i < value_size; i++)
+        for (unsigned i = 0; i < value_size; i++)
             dest[i] = value[i];
 
         end_of_params += value_size;
@@ -98,7 +109,7 @@ namespace os::ipc
 
     void *os::ipc::os_message::get_value(int offset)
     {
-        return reinterpret_cast<void*>(reinterpret_cast<char*>(shared_mem) + get_field(offset).offset);
+        return reinterpret_cast<void *>(reinterpret_cast<char *>(shared_mem) + get_field(offset).offset);
     }
 
     void os::ipc::os_message::set_value(char *name, char *value, size_t value_size)

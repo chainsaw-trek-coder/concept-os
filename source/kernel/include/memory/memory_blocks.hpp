@@ -20,6 +20,7 @@ struct memory_blocks
     free_block *free_blocks;
     free_block *free_blocks_by_address;
     unsigned size;
+    unsigned free_space; // TODO: Update tests to validate this value.
 
     /// @brief Set starting address and size of total available memory.
     /// @param address Starting address of available memory.

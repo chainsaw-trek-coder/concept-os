@@ -1,7 +1,6 @@
 #include "x86_32/globals.hpp"
 #include "x86_32/cpu.h"
 #include "memory/utils.h"
-#include "memory/memory_blocks.hpp"
 #include "x86_32/globals.hpp"
 
 // Intel recommends alignment on 8-byte boundary for best performance.
@@ -14,7 +13,7 @@ interrupt_descriptor_table __attribute__((aligned(8))) idt;
 unsigned end_of_kernel_variable __attribute__((section(".end_of_kernel")));
 void *end_of_kernel = &end_of_kernel_variable;
 
-memory_blocks mem_blocks;
+memory_blocks memory;
 
 page_directory *kernel_page_directory = nullptr;
 
@@ -46,7 +45,7 @@ void initialize_segmentation()
 void initialize_paging()
 {
     // Map kernel into pages.
-    kernel_page_directory = new (mem_blocks.allocate(sizeof(page_directory))) page_directory();
+    kernel_page_directory = new (memory.allocate(sizeof(page_directory))) page_directory();
 
     auto bytes_needed = reinterpret_cast<unsigned>(get_aligned_address(end_of_kernel));
     auto pages_needed = number_of_blocks(bytes_needed);
@@ -62,7 +61,7 @@ void initialize_paging()
     for (size_t i = 0; i < page_tables_needed; i++)
     {
         auto &entry = kernel_page_directory->entries[i];
-        entry.set_address(new (mem_blocks.allocate(sizeof(page_table))) page_table());
+        entry.set_address(new (memory.allocate(sizeof(page_table))) page_table());
         entry.set_present(true);
 
         auto &table = *entry.get_address();
@@ -88,7 +87,7 @@ void initialize_memory()
     auto memory_end = reinterpret_cast<unsigned char*>(global_mem_start) + global_mem_size;
     auto available_memory_size = memory_end - reinterpret_cast<unsigned char*>(memory_start);
 
-    mem_blocks.initialize(memory_start, available_memory_size);
+    memory.initialize(memory_start, available_memory_size);
 
     initialize_paging();
 

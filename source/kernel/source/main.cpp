@@ -137,6 +137,11 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		initialize_memory();
 		terminal_writestring("Finished setting up memory...\n");
 
+		terminal_writestring("Memory available: ");
+		int_to_string(memory.free_space, string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring(" bytes\n");
+
 		// Set interrupt table.
 		cpu::set_idtr(&idt, 256);
 
@@ -155,6 +160,11 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
+		terminal_writestring("Kernel page directory is ");
+		ptr_to_hex_string(reinterpret_cast<void *>(kernel_page_directory), string_buffer);
+		terminal_writestring(string_buffer);
+		terminal_writestring("\n");
+
 		terminal_writestring("Data segment dword1: ");
 		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword1), string_buffer);
 		terminal_writestring(string_buffer);
@@ -165,20 +175,10 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
-		auto old_gdt = reinterpret_cast<global_descriptor_table<26>*>(0x000cb2b4);
-		
-		terminal_writestring("Data segment dword1 for old gdt (1): ");
-		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword1), string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
+		// TODO: Load text mode driver...
 
-		terminal_writestring("Data segment dword2 for old gdt (1): ");
-		ptr_to_hex_string(reinterpret_cast<void *>(old_gdt->segments[1].dword2), string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
+		// TODO: Load text user interface.
 
-		// TODO: Setup kernel page directory.
-		// terminal_writestring("Paging has been setup.");
 	}
 	else
 	{

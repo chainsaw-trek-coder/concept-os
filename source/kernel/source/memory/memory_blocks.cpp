@@ -6,6 +6,7 @@ void memory_blocks::initialize(void *address, unsigned size)
     free_blocks_by_address = reinterpret_cast<free_block *>(address);
 
     this->size = size;
+    this->free_space = size;
 
     free_blocks[0].size = size;
     free_blocks[0].predecessor_by_size = nullptr;
@@ -47,7 +48,7 @@ void memory_blocks::remove_node_from_tree(free_block *block)
     block->higher_block = nullptr;
     block->smaller_block = nullptr;
     block->larger_block = nullptr;
-    size -= block->size;
+    free_space -= block->size;
 }
 
 void memory_blocks::remove_node_from_tree_by_size(free_block *block)
@@ -104,7 +105,7 @@ void memory_blocks::add_node_to_tree(free_block *block)
 {
     add_node_to_tree_by_size(block);
     add_node_to_tree_by_address(block);
-    size += block->size;
+    free_space += block->size;
 }
 
 void memory_blocks::add_node_to_tree_by_size(free_block *block)
