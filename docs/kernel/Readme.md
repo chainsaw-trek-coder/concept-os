@@ -2,22 +2,25 @@
 
 ## Boot sequence
 
-1. Setup CPU.
-2. Setup memory.
-3. Start scheduler
-4. Load Text mode driver.
+1. Kernel loader sets up memory.
+2. Kernel loader loads kernel.
+3. Kernel sets up GDT
+4. Kernel sets up IDT
+5. Load Default Storage Driver.
+6. Load Package manager
+7. Load Text mode driver.
     - Create page directory for driver.
         - Allocate page directory.
         - Allocate page tables.
         - Allocate pages.
     - Load text mode driver binary into page directory.
-    - Create application structures.
-        - Add link to page directory.
-5. Text mode driver triggers loading of Terminal UI.
-6. Load Default Storage Driver.
-7. Loading of Storage Driver triggers loading of File System Driver.
-8. Load Package manager
-9. Load Hardware Manager.
+    - Setup startup parameters for text mode driver
+        - Map video memory into process space.
+        - Pass location of video memory into text mode driver via the stack
+    - Run driver's initialization code.
+8. Text mode driver triggers loading of Terminal UI.
+9. Loading of Storage Driver triggers loading of File System Driver. 
+10. Load Hardware Manager.
     - Hardware manager scans devices.
     - Hardware manager loads relevant drivers from package manager.
     - Some drivers replace others. (e.g. Video driver replaces Text mode driver.)

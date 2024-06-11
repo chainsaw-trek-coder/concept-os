@@ -4,5 +4,13 @@
         "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include",
         "${workspaceFolder:common}/include"
     ],
-    "cmake.ignoreKitEnv": true
+    "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++",
+    "cmake.sourceDirectory": "/workspaces/concept-os/source/packages/os.text-mode-driver",
+    "cmake.buildDirectory": "${workspaceFolder}/../../../build/os.text-mode-driver",
+    "cmake.configureSettings": {
+        "CMAKE_C_COMPILER_WORKS": "1",
+        "CMAKE_CXX_COMPILER_WORKS": "1"
+    },
+    "cmake.ignoreKitEnv": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

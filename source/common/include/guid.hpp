@@ -1,4 +1,4 @@
 struct guid
 {
-    unsigned[4] value;
+    unsigned value[4];
 };

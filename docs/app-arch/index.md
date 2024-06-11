@@ -38,3 +38,8 @@ Applications can optionally implement:
 - suspend - Suspend state of connected application within this application.
 - resume - resume state of connected application to this application.
 - disconnect - Notifies application that another application has disconnected from it.
+
+
+## References
+
+[Elf Format](https://wiki.osdev.org/ELF)

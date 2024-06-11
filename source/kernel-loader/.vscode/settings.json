@@ -1,0 +1,15 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "/home/vscode/opt/cross/lib/gcc/i686-elf/9.4.0/include"
+    ],
+    "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++",
+    "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel-loader",
+    "cmake.buildDirectory": "${workspaceFolder}/../../build/kernel-loader",
+    "cmake.configureSettings": {
+        "CMAKE_C_COMPILER_WORKS": "1",
+        "CMAKE_CXX_COMPILER_WORKS": "1"
+    },
+    "cmake.ignoreKitEnv": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}

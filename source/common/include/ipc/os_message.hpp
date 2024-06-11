@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 namespace os::ipc
 {
     class os_message
@@ -42,8 +44,9 @@ namespace os::ipc
     }
 
     inline os_message::os_message(unsigned num_of_parameters, void *shared_mem, size_t shared_mem_size)
-        : shared_mem(shared_mem), shared_mem_size(shared_mem_size)
     {
+        this->shared_mem = shared_mem;
+        this->shared_mem_size = shared_mem_size;
         num_of_parameters_ptr = reinterpret_cast<unsigned *>(shared_mem);
         *num_of_parameters_ptr = num_of_parameters;
 
@@ -59,13 +62,14 @@ namespace os::ipc
     }
 
     inline os_message::os_message(void *shared_mem, size_t shared_mem_size)
-        : shared_mem(shared_mem), shared_mem_size(shared_mem_size)
     {
+        this->shared_mem = shared_mem;
+        this->shared_mem_size = shared_mem_size;
         num_of_parameters_ptr = reinterpret_cast<unsigned *>(shared_mem);
 
         fields = reinterpret_cast<field *>(num_of_parameters_ptr + 1);
 
-        end_of_params = sizeof(num_of_parameters) + (sizeof(field) * num_of_parameters);
+        end_of_params = sizeof(unsigned) + (sizeof(field) * *num_of_parameters_ptr);
     }
 
     inline os_message::os_message(unsigned num_of_parameters)

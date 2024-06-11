@@ -1,0 +1,1 @@
+void* get_aligned_address(void* address);

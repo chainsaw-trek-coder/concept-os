@@ -16,11 +16,9 @@ SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 ENABLE_LANGUAGE(ASM-ATT)
 
-configure_file(linker.ld ./ COPYONLY)
-
 FILE(GLOB C_SRCS *.cpp **/*.cpp memory/*/*.cpp)
 
 include_directories("../include")
-ADD_EXECUTABLE(kernel ${C_SRCS} x86_32/boot.s)
+ADD_EXECUTABLE(kernel ${C_SRCS})
 
-SET_TARGET_PROPERTIES(kernel PROPERTIES LINK_FLAGS "-T linker.ld -ffreestanding -O2 -nostdlib")
+SET_TARGET_PROPERTIES(kernel PROPERTIES LINK_FLAGS " -ffreestanding -O2 -nostdlib -r")

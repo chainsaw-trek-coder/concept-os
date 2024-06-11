@@ -14,34 +14,12 @@
 #endif
 
 #if defined(__i386__)
-#include "x86_32/multiboot.h"
 #include "x86_32/globals.hpp"
+#include "x86_32/multiboot.h"
 #include "x86_32/cpu.h"
 #endif
 
-#if defined(__x86_64__)
-#include "x86_64/multiboot.h"
-#endif
-
 #include "terminal.h"
-
-// Doesn't work in protected mode...
-// void get_physical_memory(short *low_mem, short *high_mem)
-// {
-// 	short a = 0, b = 0;
-
-// 	asm volatile(
-// 		"xor %%ecx, %%ecx\n\t"
-// 		"xor %%edx, %%edx\n\t"
-// 		"movw $0xE801, %%eax\n\t"
-// 		"int $0x15\n\t"
-// 		"movw %%ax, %[low]\n\t"
-// 		"movw %%bx, %[high]\n\t"
-// 		: [low] "=r"(a), [high] "=r"(b));
-
-// 	*low_mem = a;
-// 	*high_mem = b;
-// }
 
 void print_mem_entry(multiboot_memory_map_t &mem_entry)
 {
@@ -94,7 +72,9 @@ void set_global_memory(multiboot_memory_map_t &mem_entry)
 #endif
 }
 
-extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
+extern "C" void kernel_main(multiboot_info_t *mbd, 
+	uint32_t magic,
+	memory_blocks mem_blocks)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
@@ -133,9 +113,11 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
 
-		terminal_writestring("Setting up memory...\n");
-		initialize_memory();
-		terminal_writestring("Finished setting up memory...\n");
+		terminal_writestring("Setting up segmentation...\n");
+		initialize_segmentation();
+		terminal_writestring("Finished setting up segmentation...\n");
+
+		memory = mem_blocks;
 
 		terminal_writestring("Memory available: ");
 		int_to_string(memory.free_space, string_buffer);
@@ -155,11 +137,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
 
-		terminal_writestring("End of kernel is ");
-		ptr_to_hex_string(reinterpret_cast<void *>(end_of_kernel), string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
-
+		// TODO: Save kernel page directory into variable.
 		terminal_writestring("Kernel page directory is ");
 		ptr_to_hex_string(reinterpret_cast<void *>(kernel_page_directory), string_buffer);
 		terminal_writestring(string_buffer);
@@ -174,10 +152,6 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		ptr_to_hex_string(reinterpret_cast<void *>(gdt.data_segment.dword2), string_buffer);
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
-
-		// TODO: Load text mode driver...
-
-		// TODO: Load text user interface.
 
 	}
 	else

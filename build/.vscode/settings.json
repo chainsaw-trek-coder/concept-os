@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/workspaces/concept-os/source/common"
+    "cmake.sourceDirectory": "/workspaces/concept-os/source/common",
+    "cmake.ignoreCMakeListsMissing": true
 }

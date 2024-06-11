@@ -23,6 +23,6 @@ inline void *operator new(size_t, void *__p)
     return __p;
 }
 
-void initialize_memory();
+void initialize_segmentation();
 
 #endif

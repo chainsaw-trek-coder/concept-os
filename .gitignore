@@ -5,5 +5,8 @@ helloworld/isodir/**
 *.log
 *.pid
 
+build/kernel-common/**
+build/kernel-loader/**
 build/kernel/**
 build/common/**
+build/os.text-mode-driver/**

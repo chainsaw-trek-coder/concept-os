@@ -9,13 +9,22 @@
             "path": "./docs"
         },
         {
+            "name": "common",
+            "path": "./source/common"
+        },
+        {
+            "name": "kernel-common",
+            "path": "./source/kernel-common"
+        },        
+        {
+            "name": "kernel-loader",
+            "path": "./source/kernel-loader"
+        },
+        {
             "name": "kernel",
             "path": "./source/kernel"
         },
         {
-            "name": "common",
-            "path": "./source/common"
-        },        {
             "name": "os.text-mode-driver",
             "path": "./source/packages/os.text-mode-driver"
         },
