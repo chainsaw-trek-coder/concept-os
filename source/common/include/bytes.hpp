@@ -17,7 +17,7 @@ namespace os
         void write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size);
     };
 
-    inline bytes::write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size)
+    inline void bytes::write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size)
     {
         while(source_size > 0)
         {

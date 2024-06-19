@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 # project(kernel_tests)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+SET(CMAKE_ASM-ATT_FLAGS "${CMAKE_ASM-ATT_FLAGS} --32")
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -24,11 +25,16 @@ enable_testing()
 
 include_directories("../include", "../../common/include")
 
+ENABLE_LANGUAGE(ASM-ATT)
+
+configure_file(kernel ./ COPYONLY)
+
 FILE(GLOB C_SRCS *.cpp **/*.cpp ipc/*.cpp)
 
 add_executable(
   kernel_common_lib_tests
   ${C_SRCS}
+  kernel.s
 )
 
 target_link_libraries(

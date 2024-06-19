@@ -2,13 +2,13 @@
 
 namespace os
 {
-    enum bitness
+    enum elf_bitness
     {
         _32bit = 0,
         _64bit = 1
     };
 
-    enum endianess
+    enum elf_endianess
     {
         little_endian = 1,
         big_endian = 2
@@ -22,7 +22,7 @@ namespace os
         core = 4
     };
 
-    enum instruction_set
+    enum elf_instruction_set
     {
         non_specific = 0,
         spark = 2,
@@ -39,10 +39,10 @@ namespace os
     {
     private:
         bool is_valid;
-        bitness bitness;
-        endianess endianess;
+        elf_bitness bitness;
+        elf_endianess endianess;
         elf_type type;
-        instruction_set instruction_set;
+        elf_instruction_set instruction_set;
         unsigned long long program_entry;
 
     public:
@@ -65,12 +65,12 @@ namespace os
 
         if(is_valid)
         {
-            this->bitness = static_cast<int>(header[4]);
-            this->endianess = static_cast<int>(header[5]);
-            this->type = *reinterpret_cast<short*>(&header[16]);
-            this->instruction_set = *reinterpret_cast<short*>(&header[18]);
+            this->bitness = static_cast<elf_bitness>(static_cast<int>(header[4]));
+            this->endianess = static_cast<elf_endianess>(static_cast<int>(header[5]));
+            this->type = static_cast<elf_type>(*reinterpret_cast<short*>(&header[16]));
+            this->instruction_set = static_cast<elf_instruction_set>(*reinterpret_cast<short*>(&header[18]));
 
-            if(this->bitness == bitness::_32bit)
+            if(this->bitness == elf_bitness::_32bit)
             {
                 this->program_entry = *reinterpret_cast<unsigned*>(&header[24]);
             }
