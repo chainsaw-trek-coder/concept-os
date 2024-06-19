@@ -4,8 +4,9 @@ namespace os
 {
     enum elf_bitness
     {
-        _32bit = 0,
-        _64bit = 1
+        none = 0,
+        _32bit = 1,
+        _64bit = 2
     };
 
     enum elf_endianess
@@ -47,6 +48,11 @@ namespace os
 
     public:
         elf_reader(stream &stream);
+
+        elf_bitness get_bitness() { return bitness; }
+        elf_endianess get_endianess() { return endianess; }
+        elf_type get_type() { return type; }
+        elf_instruction_set get_instruction_set() { return instruction_set; }
     };
 
     inline elf_reader::elf_reader(stream &stream)

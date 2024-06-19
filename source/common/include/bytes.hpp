@@ -14,11 +14,13 @@ namespace os
 
         unsigned get_size() { return size; }
         void *get_data() { return data; }
-        void write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size);
+        unsigned write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size);
     };
 
-    inline void bytes::write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size)
+    inline unsigned bytes::write_data(unsigned destination_position, void *source, unsigned source_position, unsigned source_size)
     {
+        unsigned original_source_position = source_position;
+        
         while(source_size > 0)
         {
             if(destination_position >= size)
@@ -31,9 +33,9 @@ namespace os
 
             destination_position++;
             source_position++;
-            source_size--;
         }
-        
+
+        return source_position - original_source_position;        
     }
 
 }
