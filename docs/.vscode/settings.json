@@ -1,5 +1,6 @@
 {
     "cmake.configureOnOpen": false,
     "cmake.ignoreCMakeListsMissing": true,
-    "cmake.ignoreKitEnv": true
+    "cmake.ignoreKitEnv": true,
+    "C_Cpp.default.compilerPath": ""
 }

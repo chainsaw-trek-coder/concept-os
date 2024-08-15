@@ -15,4 +15,18 @@ TEST(ELFReaderTests, elf_reader_can_read_header)
     EXPECT_EQ(reader.get_endianess(), elf_endianess::little_endian);
     EXPECT_EQ(reader.get_instruction_set(), elf_instruction_set::x86);
     EXPECT_EQ(reader.get_type(), elf_type::relocatable);
+
+    EXPECT_EQ(reader.get_program_entry_offset(), 0);
+    EXPECT_EQ(reader.get_program_header_offset(), 0);
+    EXPECT_EQ(reader.get_section_header_offset(), 83916);
+
+    EXPECT_EQ(reader.get_flags(), 0);
+    EXPECT_EQ(reader.get_elf_header_size(), 52);
+    EXPECT_EQ(reader.get_program_header_entry_size(), 0);
+    EXPECT_EQ(reader.get_number_of_program_header_entries(), 0);
+
+    EXPECT_EQ(reader.get_section_header_entry_size(), 40);
+    EXPECT_EQ(reader.get_number_of_section_header_entries(), 29);
+
+    EXPECT_EQ(reader.get_section_header_string_table_index(), 28);
 }
