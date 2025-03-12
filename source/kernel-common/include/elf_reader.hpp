@@ -36,9 +36,30 @@ namespace os
         risk_v = 0xF3
     };
 
+    struct elf_section
+    {
+        unsigned long long name = 0;
+        unsigned long long type = 0;
+        unsigned long long flags = 0;
+        unsigned long long address_in_memory = 0;
+        unsigned long long offset_in_file = 0;
+        unsigned long long section_size = 0;
+        unsigned long long link = 0;
+        unsigned long long info = 0;
+        unsigned long long address_alignment = 0;
+        unsigned long long entry_size_if_applicable = 0;
+
+        inline bool is_writable() { return 0x1 & flags; }
+        inline bool is_allocated() { return 0x2 & flags; }
+        inline bool is_executable() { return 0x4 & flags; }
+    };
+
     class elf_reader
     {
     private:
+
+        stream *elf_stream;
+
         bool is_valid;
         elf_bitness bitness;
         elf_endianess endianess;
@@ -49,16 +70,19 @@ namespace os
         unsigned long long section_header_offset;
 
         unsigned flags;
-        short elf_header_size;
-        short program_header_entry_size;
+        short elf_header_size = 0;
+        short program_header_entry_size = 0;
         short number_of_program_header_entries;
-        short section_header_entry_size;
-        short number_of_section_header_entries;
+        short section_header_entry_size = 0;
+        short number_of_section_header_entries = 0;
 
         short section_header_string_table_index;
 
+        short current_section_index;
+        elf_section current_section;
+
     public:
-        elf_reader(stream &stream);
+        elf_reader(stream &elf_stream);
 
         elf_bitness get_bitness() { return bitness; }
         elf_endianess get_endianess() { return endianess; }
@@ -78,16 +102,22 @@ namespace os
         short get_number_of_section_header_entries() { return number_of_section_header_entries; }
 
         short get_section_header_string_table_index() { return section_header_string_table_index; }
+
+        void set_current_section_index(short index);
+        short get_current_section_index();
+        elf_section &get_current_section();
     };
 
 #define CAST_BINARY_FIELD(array, array_offset, type) *reinterpret_cast<type*>(&array[array_offset])
 
-    inline elf_reader::elf_reader(stream &stream)
+    inline elf_reader::elf_reader(stream &elf_stream)
     {
+        this->elf_stream = &elf_stream;
+
         unsigned char header[64];
         
         is_valid = false;
-        if(stream.read_bytes(bytes(header, 64), 64) == 64)
+        if(elf_stream.read_bytes(bytes(header, 64), 64) == 64)
         {
             is_valid = true;
             is_valid &= (header[0] == 0x7F);
@@ -131,5 +161,47 @@ namespace os
             }
         }
 
+    }
+    
+    inline void elf_reader::set_current_section_index(short index)
+    {
+        unsigned char section[sizeof(elf_section)];
+
+        elf_stream->seek(this->section_header_offset + (this->section_header_entry_size * index));
+
+        if(this->bitness == elf_bitness::_32bit)
+        {
+            if(elf_stream->read_bytes(bytes(section, sizeof(elf_section)), sizeof(elf_section) / 2) == sizeof(elf_section) / 2)
+            {
+                current_section.name = CAST_BINARY_FIELD(section, 0, unsigned);
+                current_section.type = CAST_BINARY_FIELD(section, 4, unsigned);
+                current_section.flags = CAST_BINARY_FIELD(section, 8, unsigned);
+                current_section.address_in_memory = CAST_BINARY_FIELD(section, 12, unsigned);
+                current_section.offset_in_file = CAST_BINARY_FIELD(section, 16, unsigned);
+                current_section.section_size = CAST_BINARY_FIELD(section, 20, unsigned);
+                current_section.link = CAST_BINARY_FIELD(section, 24, unsigned);
+                current_section.info = CAST_BINARY_FIELD(section, 28, unsigned);
+                current_section.address_alignment = CAST_BINARY_FIELD(section, 32, unsigned);
+                current_section.entry_size_if_applicable = CAST_BINARY_FIELD(section, 36, unsigned);
+            }
+            else
+            {
+                // TODO: We really need exception handling...
+            }
+        }
+        else
+        {
+            // TODO: ...
+        }
+
+        this->current_section_index = index;
+    }
+    inline short elf_reader::get_current_section_index()
+    {
+        return this->current_section_index;
+    }
+    inline elf_section &elf_reader::get_current_section()
+    {
+        return this->current_section;
     }
 }

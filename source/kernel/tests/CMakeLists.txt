@@ -25,7 +25,7 @@ FILE(GLOB KERNEL_SRCS ../source/*.cpp ../source/*/*.cpp ../source/memory/*/*.cpp
 
 enable_testing()
 
-include_directories("../include")
+include_directories("../include", "../../common/include", "../../kernel-common/include")
 
 add_executable(
   kernel_tests
@@ -36,6 +36,7 @@ add_executable(
 target_link_libraries(
   kernel_tests
   GTest::gtest_main
+  "${CMAKE_CURRENT_BINARY_DIR}/../kernel-common/src/kernel_common-build/libkernel_common.a"
 )
 
 include(GoogleTest)

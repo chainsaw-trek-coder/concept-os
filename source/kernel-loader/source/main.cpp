@@ -143,21 +143,20 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring(string_buffer);
 		terminal_writestring(" bytes\n");
 
-		terminal_writestring("Kernel image is at ");
-		ptr_to_hex_string(reinterpret_cast<void *>(kernel_x86_32), string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
+		// terminal_writestring("Kernel image is at ");
+		// ptr_to_hex_string(reinterpret_cast<void *>(kernel_x86_32), string_buffer);
+		// terminal_writestring(string_buffer);
+		// terminal_writestring("\n");
 
-		terminal_writestring("Kernel image size is ");
-		int_to_string(kernel_x86_32_size, string_buffer);
-		terminal_writestring(string_buffer);
-		terminal_writestring("\n");
+		// terminal_writestring("Kernel image size is ");
+		// int_to_string(kernel_x86_32_size, string_buffer);
+		// terminal_writestring(string_buffer);
+		// terminal_writestring("\n");
 
 		terminal_writestring("End of kernel loader is ");
 		ptr_to_hex_string(reinterpret_cast<void *>(end_of_kernel_loader), string_buffer);
 		terminal_writestring(string_buffer);
 		terminal_writestring("\n");
-
 
 		terminal_writestring("Kernel page directory is ");
 		ptr_to_hex_string(reinterpret_cast<void *>(kernel_page_directory), string_buffer);
@@ -165,6 +164,7 @@ extern "C" void kernel_main(multiboot_info_t *mbd, uint32_t magic)
 		terminal_writestring("\n");
 
 		// TOOD: Load kernel
+		// load_kernel();
 
 	}
 	else

@@ -1,3 +1,4 @@
+#include "os_new.hpp"
 #include "memory/x86_32/paging.hpp"
 #include "memory/paging.hpp"
 
@@ -10,7 +11,7 @@ page_table_entry::page_table_entry()
     data = 0;
 }
 
-void page_table_entry::set_address(void* address)
+void page_table_entry::set_address(void *address)
 {
     // TODO: Should I check that the address is 4K aligned here
     //       or in a unit test of code using this method? 🤔
@@ -22,7 +23,7 @@ void page_table_entry::set_address(void* address)
 void *page_table_entry::get_address()
 {
     // Make sure to chop off the flags.
-    return reinterpret_cast<void*>(data & 0xFFFFF000);
+    return reinterpret_cast<void *>(data & 0xFFFFF000);
 }
 
 bool page_table_entry::is_global_page()
@@ -32,7 +33,7 @@ bool page_table_entry::is_global_page()
 
 void page_table_entry::set_global_page(bool is_global_page)
 {
-    if(is_global_page)
+    if (is_global_page)
         data |= 0x100;
     else
         data &= ~(0x100);
@@ -44,7 +45,6 @@ short page_table_entry::page_table_attribute_index()
     return (data & mask) > 0;
 }
 
-
 bool page_table_entry::is_dirty()
 {
     auto mask = 0x40;
@@ -55,7 +55,7 @@ void page_table_entry::set_dirty(bool is_dirty)
 {
     auto mask = 0x40;
 
-    if(is_dirty)
+    if (is_dirty)
         data |= mask;
     else
         data &= ~mask;
@@ -86,10 +86,10 @@ void page_table_entry::set_type(page_entry_type type)
 {
     auto mask = 0x4;
 
-    if(type == page_entry_type::user)
+    if (type == page_entry_type::user)
         data |= mask;
-    
-    if(type == page_entry_type::supervisor)
+
+    if (type == page_entry_type::supervisor)
         data &= ~mask;
 }
 
@@ -110,7 +110,7 @@ void page_table_entry::set_writable(bool is_writable)
 {
     auto mask = 0x2;
 
-    if(is_writable)
+    if (is_writable)
         data |= mask;
     else
         data &= ~mask;
@@ -125,7 +125,7 @@ void page_table_entry::set_present(bool is_present)
 {
     auto mask = 0x1;
 
-    if(is_present)
+    if (is_present)
         data |= mask;
     else
         data &= ~mask;
@@ -196,7 +196,7 @@ void page_directory_entry::set_writable(bool is_writable)
 {
     auto mask = 0x2;
 
-    if(is_writable)
+    if (is_writable)
         data |= mask;
     else
         data &= ~mask;
@@ -211,8 +211,56 @@ void page_directory_entry::set_present(bool is_present)
 {
     auto mask = 0x1;
 
-    if(is_present)
+    if (is_present)
         data |= mask;
     else
         data &= ~mask;
+}
+
+bool page_directory::is_mapped(void *address)
+{
+    unsigned directory_entry_index = (reinterpret_cast<unsigned>(address) & 0xFFC00000) >> 22;
+    unsigned table_entry_index = (reinterpret_cast<unsigned>(address) & 0x003FF000) >> 12;
+
+    if (this->entries[directory_entry_index].data == 0)
+        return false;
+
+    auto &directory_entry = this->entries[directory_entry_index];
+
+    if (directory_entry.get_address()->entries[table_entry_index].get_address() == nullptr)
+        return false;
+
+    return true;
+}
+
+page_table_entry *page_directory::get_page_entry(void *virtual_address)
+{
+    unsigned directory_entry_index = (reinterpret_cast<unsigned>(virtual_address) & 0xFFC00000) >> 22;
+    unsigned table_entry_index = (reinterpret_cast<unsigned>(virtual_address) & 0x003FF000) >> 12;
+
+    if (this->entries[directory_entry_index].data == 0)
+        return nullptr;
+
+    auto &directory_entry = this->entries[directory_entry_index];
+
+    return &directory_entry.get_address()->entries[table_entry_index];
+}
+
+page_table_entry *page_directory::map(mem_allocator allocator, void *virtual_address, void *physical_address)
+{
+    unsigned directory_entry_index = (reinterpret_cast<unsigned>(virtual_address) & 0xFFC00000) >> 22;
+    unsigned table_entry_index = (reinterpret_cast<unsigned>(virtual_address) & 0x003FF000) >> 12;
+
+    auto &pg_entry = this->entries[directory_entry_index];
+
+    if (pg_entry.get_address() == nullptr)
+    {
+        pg_entry.set_address(new (allocator.allocate(sizeof(page_table))) page_table());
+        pg_entry.set_present(true);
+    }
+
+    auto &table_entry = pg_entry.get_address()->entries[table_entry_index];
+    table_entry.set_address(physical_address);
+
+    return &table_entry;
 }

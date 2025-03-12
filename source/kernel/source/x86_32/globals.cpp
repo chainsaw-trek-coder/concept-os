@@ -10,7 +10,7 @@ interrupt_descriptor_table __attribute__((aligned(8))) idt;
 unsigned global_mem_size;
 void *global_mem_start;
 
-memory_blocks memory;
+mem_allocator memory;
 page_directory *kernel_page_directory = nullptr;
 
 void initialize_segmentation()

@@ -1,6 +1,8 @@
 #ifndef header_57f15ad7_5e7f_4313_a12e_65971fa13977
 #define header_57f15ad7_5e7f_4313_a12e_65971fa13977
 
+#include "memory/mem_allocator.hpp"
+
 enum page_entry_type
 {
     user = 1,
@@ -60,6 +62,10 @@ struct page_directory_entry
 struct page_directory
 {
     page_directory_entry entries[1024];
+
+    bool is_mapped(void* address);
+    page_table_entry *get_page_entry(void *virtual_address);
+    page_table_entry *map(mem_allocator allocator, void *virtual_address, void *physical_address);
 };
 
 #endif

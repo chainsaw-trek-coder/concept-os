@@ -25,6 +25,10 @@
             "path": "./source/kernel"
         },
         {
+            "name": "fs_library",
+            "path": "./source/fs_library"
+        },
+        {
             "name": "os.text-mode-driver",
             "path": "./source/packages/os.text-mode-driver"
         },

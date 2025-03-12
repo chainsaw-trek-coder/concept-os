@@ -74,7 +74,7 @@ void set_global_memory(multiboot_memory_map_t &mem_entry)
 
 extern "C" void kernel_main(multiboot_info_t *mbd, 
 	uint32_t magic,
-	memory_blocks mem_blocks)
+	mem_allocator mem_blocks)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();

@@ -1,0 +1,18 @@
+[package]
+name = "concept_fs"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "concept_fs"
+crate-type = ["staticlib"]
+
+[dependencies]
+
+[profile.dev]
+debug = true
+panic = "abort"
+
+[profile.release]
+debug = true
+panic = "abort"

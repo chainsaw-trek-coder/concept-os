@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-# project(kernel_tests)
+# project(kernel_common_tests)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 SET(CMAKE_ASM-ATT_FLAGS "${CMAKE_ASM-ATT_FLAGS} --32")
@@ -29,7 +29,7 @@ ENABLE_LANGUAGE(ASM-ATT)
 
 configure_file(kernel ./ COPYONLY)
 
-FILE(GLOB C_SRCS *.cpp **/*.cpp ipc/*.cpp)
+FILE(GLOB C_SRCS *.cpp **/*.cpp ipc/*.cpp ../source/**/*.cpp)
 
 add_executable(
   kernel_common_lib_tests

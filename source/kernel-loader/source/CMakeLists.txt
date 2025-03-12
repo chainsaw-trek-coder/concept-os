@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 # project(kernel)
 
@@ -14,21 +14,17 @@ set(CMAKE_CXX_FLAGS "-ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti"
 SET(CMAKE_EXE_LINKER_FLAGS "-ffreestanding -O2 -nostdlib")
 SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-# TODO: Move this binary into a file system
-include(ExternalProject)
-ExternalProject_Add(kernel
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../kernel/source"
-    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}"
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-)
-
 ENABLE_LANGUAGE(ASM-ATT)
 
 configure_file(linker.ld ./ COPYONLY)
 
 FILE(GLOB C_SRCS *.cpp **/*.cpp memory/*/*.cpp)
 
-include_directories("../include")
+include_directories("../include", "../../common/include", "../../kernel-common/include")
+
 ADD_EXECUTABLE(kernel_loader ${C_SRCS} x86_32/kernel.s x86_32/boot.s)
+add_dependencies(kernel_loader kernel_common)
+
+target_link_libraries(kernel_loader "${CMAKE_CURRENT_BINARY_DIR}/../kernel-common/src/kernel_common-build/libkernel_common.a")
 
 SET_TARGET_PROPERTIES(kernel_loader PROPERTIES LINK_FLAGS "-T linker.ld -ffreestanding -O2 -nostdlib")

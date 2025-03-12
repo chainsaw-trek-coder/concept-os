@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "kernel-tests (Debug)",
+            "name": "kernel-common (Debug)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder:build}/kernel/tests/kernel_tests",
+            "program": "${workspaceFolder:build}/kernel-common/tests/kernel_common_lib_tests",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

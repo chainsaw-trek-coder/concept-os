@@ -8,7 +8,7 @@ namespace os
         bytes data;
 
     public:
-        memory_stream(bytes data) : data(data), position(0) {}
+        memory_stream(bytes data) : position(0), data(data) {}
 
         bool seek(unsigned position) override;
         unsigned read_bytes(bytes destination, unsigned size) override;

@@ -1,7 +1,6 @@
-#include "bytes.hpp"
-
 #ifndef header_9ef0113d_dd53_4a64_a772_5834c8a034cc
 #define header_9ef0113d_dd53_4a64_a772_5834c8a034cc
+#include "bytes.hpp"
 
 namespace os
 {

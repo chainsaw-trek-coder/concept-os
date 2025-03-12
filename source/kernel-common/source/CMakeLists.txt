@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 
 # project(kernel)
 
@@ -18,11 +18,7 @@ ENABLE_LANGUAGE(ASM-ATT)
 
 FILE(GLOB C_SRCS *.cpp **/*.cpp memory/*/*.cpp)
 
-include_directories("../include", "../../common/include", "../../kernel-common/include")
-ADD_EXECUTABLE(kernel ${C_SRCS})
+include_directories("../include", "../../common/include")
+ADD_LIBRARY(kernel_common ${C_SRCS})
 
-add_dependencies(kernel kernel_common)
-
-target_link_libraries(kernel "${CMAKE_CURRENT_BINARY_DIR}/../kernel-common/src/kernel_common-build/libkernel_common.a")
-
-SET_TARGET_PROPERTIES(kernel PROPERTIES LINK_FLAGS " -ffreestanding -O2 -nostdlib -r")
+SET_TARGET_PROPERTIES(kernel_common PROPERTIES LINK_FLAGS " -ffreestanding -O2 -nostdlib -r")

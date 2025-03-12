@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "memory/memory_blocks.hpp"
+#include "memory/mem_allocator.hpp"
 #include <algorithm>
 #include <random>
 #include <vector>
@@ -92,22 +92,23 @@ TEST(MemoryTests, blocks_can_initialize_free_blocks)
     for (unsigned i = 0; i < 4096 * 16; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
 
     auto first_free_block = reinterpret_cast<free_block *>(memory);
 
-    EXPECT_EQ(first_free_block, _memory_blocks.free_blocks);
-    EXPECT_EQ(_memory_blocks.size, 4096 * 16);
+    EXPECT_EQ(first_free_block, _allocator.free_blocks);
+    EXPECT_EQ(_allocator.size, 4096 * 16);
     EXPECT_EQ(first_free_block->size, 4096 * 16);
     EXPECT_EQ(first_free_block->smaller_block, nullptr);
     EXPECT_EQ(first_free_block->larger_block, nullptr);
 }
 
-TEST(MemoryTests, free_blocks_are_4096_bytes)
-{
-    EXPECT_EQ(sizeof(free_block), 4096);
-}
+// Genericizing the structures
+// TEST(MemoryTests, free_blocks_are_4096_bytes)
+// {
+//     EXPECT_EQ(78, 4096);
+// }
 
 TEST(MemoryTests, blocks_can_allocate_a_block)
 {
@@ -117,16 +118,16 @@ TEST(MemoryTests, blocks_can_allocate_a_block)
     for (unsigned i = 0; i < 4096 * 16; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
 
-    auto allocated_block = _memory_blocks.allocate(4096);
+    auto allocated_block = _allocator.allocate(4096);
 
-    EXPECT_EQ(_memory_blocks.free_blocks->size, initial_size - 4096);
-    EXPECT_NE(reinterpret_cast<void *>(_memory_blocks.free_blocks), allocated_block);
-    EXPECT_EQ(_memory_blocks.free_blocks->predecessor_by_size, nullptr);
-    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block, nullptr);
-    EXPECT_EQ(_memory_blocks.free_blocks->larger_block, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->size, initial_size - 4096);
+    EXPECT_NE(reinterpret_cast<void *>(_allocator.free_blocks), allocated_block);
+    EXPECT_EQ(_allocator.free_blocks->predecessor_by_size, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->smaller_block, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->larger_block, nullptr);
 }
 
 TEST(MemoryTests, blocks_can_allocate_two_blocks)
@@ -137,19 +138,19 @@ TEST(MemoryTests, blocks_can_allocate_two_blocks)
     for (unsigned i = 0; i < 4096 * 16; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
 
-    auto allocated_block_1 = _memory_blocks.allocate(4096);
-    auto allocated_block_2 = _memory_blocks.allocate(4096);
+    auto allocated_block_1 = _allocator.allocate(4096);
+    auto allocated_block_2 = _allocator.allocate(4096);
 
-    EXPECT_EQ(_memory_blocks.free_blocks->size, initial_size - 4096 - 4096);
-    EXPECT_NE(reinterpret_cast<void *>(_memory_blocks.free_blocks), allocated_block_1);
-    EXPECT_NE(reinterpret_cast<void *>(_memory_blocks.free_blocks), allocated_block_2);
+    EXPECT_EQ(_allocator.free_blocks->size, initial_size - 4096 - 4096);
+    EXPECT_NE(reinterpret_cast<void *>(_allocator.free_blocks), allocated_block_1);
+    EXPECT_NE(reinterpret_cast<void *>(_allocator.free_blocks), allocated_block_2);
     EXPECT_NE(allocated_block_1, allocated_block_2);
-    EXPECT_EQ(_memory_blocks.free_blocks->predecessor_by_size, nullptr);
-    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block, nullptr);
-    EXPECT_EQ(_memory_blocks.free_blocks->larger_block, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->predecessor_by_size, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->smaller_block, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->larger_block, nullptr);
 }
 
 TEST(MemoryTests, blocks_can_deallocate_a_block)
@@ -160,24 +161,24 @@ TEST(MemoryTests, blocks_can_deallocate_a_block)
     for (unsigned i = 0; i < 4096 * 16; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
 
-    auto allocated_block_1 = _memory_blocks.allocate(4096);
-    auto allocated_block_2 = _memory_blocks.allocate(4096);
-    auto allocated_block_3 = _memory_blocks.allocate(4096);
+    auto allocated_block_1 = _allocator.allocate(4096);
+    auto allocated_block_2 = _allocator.allocate(4096);
+    auto allocated_block_3 = _allocator.allocate(4096);
 
-    _memory_blocks.deallocate(allocated_block_2);
+    _allocator.deallocate(allocated_block_2);
 
-    EXPECT_EQ(_memory_blocks.free_blocks->size, initial_size - 4096 - 4096 - 4096);
-    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block->size, 4096);
+    EXPECT_EQ(_allocator.free_blocks->size, initial_size - 4096 - 4096 - 4096);
+    EXPECT_EQ(_allocator.free_blocks->smaller_block->size, 4096);
 
-    EXPECT_NE(reinterpret_cast<void *>(_memory_blocks.free_blocks), allocated_block_1);
-    EXPECT_NE(reinterpret_cast<void *>(_memory_blocks.free_blocks), allocated_block_3);
+    EXPECT_NE(reinterpret_cast<void *>(_allocator.free_blocks), allocated_block_1);
+    EXPECT_NE(reinterpret_cast<void *>(_allocator.free_blocks), allocated_block_3);
 
-    EXPECT_EQ(_memory_blocks.free_blocks->predecessor_by_size, nullptr);
-    EXPECT_EQ(_memory_blocks.free_blocks->smaller_block, reinterpret_cast<free_block *>(allocated_block_2));
-    EXPECT_EQ(_memory_blocks.free_blocks->larger_block, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->predecessor_by_size, nullptr);
+    EXPECT_EQ(_allocator.free_blocks->smaller_block, reinterpret_cast<free_block *>(allocated_block_2));
+    EXPECT_EQ(_allocator.free_blocks->larger_block, nullptr);
 }
 
 TEST(MemoryTests, blocks_can_simply_allocate_and_deallocate)
@@ -188,42 +189,42 @@ TEST(MemoryTests, blocks_can_simply_allocate_and_deallocate)
     for (unsigned i = 0; i < 4096 * 16; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
-    auto allocated_block_1 = _memory_blocks.allocate(4096);
+    auto allocated_block_1 = _allocator.allocate(4096);
     // Tree should have on smaller block.
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 15);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 15);
 
-    auto allocated_block_2 = _memory_blocks.allocate(4096);
+    auto allocated_block_2 = _allocator.allocate(4096);
     // Tree should have yet an even smaller block.
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 14);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 14);
 
-    auto allocated_block_3 = _memory_blocks.allocate(4096);
+    auto allocated_block_3 = _allocator.allocate(4096);
     // Tree should have yet an even smaller block.
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 13);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 13);
 
-    _memory_blocks.deallocate(allocated_block_1);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 14);
+    _allocator.deallocate(allocated_block_1);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 14);
 
-    _memory_blocks.deallocate(allocated_block_3);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 15);
+    _allocator.deallocate(allocated_block_3);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 15);
 
-    _memory_blocks.deallocate(allocated_block_2);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 16);
+    _allocator.deallocate(allocated_block_2);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 16);
 
-    allocated_block_1 = _memory_blocks.allocate(4096);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 15);
+    allocated_block_1 = _allocator.allocate(4096);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 15);
 
-    allocated_block_2 = _memory_blocks.allocate(4096);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 14);
+    allocated_block_2 = _allocator.allocate(4096);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 14);
 
-    _memory_blocks.deallocate(allocated_block_2);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 15);
+    _allocator.deallocate(allocated_block_2);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 15);
 
-    _memory_blocks.deallocate(allocated_block_1);
-    validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, 4096 * 16);
+    _allocator.deallocate(allocated_block_1);
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, 4096 * 16);
 }
 
 TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
@@ -235,8 +236,8 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
     for (unsigned i = 0; i < 4096 * num_blocks; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
     vector<void *> blocks;
@@ -258,18 +259,18 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
             if (blocks_allocated < num_blocks)
             {
                 cout << "Allocating block...";
-                auto new_block = _memory_blocks.allocate(4096);
+                auto new_block = _allocator.allocate(4096);
                 cout << new_block << endl;
                 EXPECT_NE(new_block, nullptr);
                 blocks.push_back(new_block);
                 blocks_allocated++;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             else
             {
                 cout << "Allocated block while out of memory..." << endl;
-                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                EXPECT_EQ(_allocator.allocate(4096), nullptr);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             break;
 
@@ -283,9 +284,9 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate)
                 cout << "Deallocating block " << block_to_deallocate_position << "..." << block_to_deallocate << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
-                _memory_blocks.deallocate(block_to_deallocate);
+                _allocator.deallocate(block_to_deallocate);
                 blocks_allocated--;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
 
             // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.
@@ -303,8 +304,8 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate_1thousand_times)
     for (unsigned i = 0; i < 4096 * num_blocks; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
     vector<void *> blocks;
@@ -326,18 +327,18 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate_1thousand_times)
             if (blocks_allocated < num_blocks)
             {
                 cout << "Allocating block...";
-                auto new_block = _memory_blocks.allocate(4096);
+                auto new_block = _allocator.allocate(4096);
                 cout << new_block << endl;
                 EXPECT_NE(new_block, nullptr);
                 blocks.push_back(new_block);
                 blocks_allocated++;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             else
             {
                 cout << "Allocated block while out of memory..." << endl;
-                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                EXPECT_EQ(_allocator.allocate(4096), nullptr);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             break;
 
@@ -351,14 +352,110 @@ TEST(MemoryTests, blocks_can_randomly_allocate_and_deallocate_1thousand_times)
                 cout << "Deallocating block " << block_to_deallocate_position << "..." << block_to_deallocate << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
-                _memory_blocks.deallocate(block_to_deallocate);
+                _allocator.deallocate(block_to_deallocate);
                 blocks_allocated--;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
 
             // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.
             break;
         }
+    }
+}
+
+TEST(MemoryTests, blocks_can_allocate_at_specific_location)
+{
+    unsigned num_blocks = 1024;
+    unsigned initial_size = num_blocks * 4096;
+    unsigned char memory[initial_size];
+
+    for (unsigned i = 0; i < initial_size; i++)
+        memory[i] = 0xff;
+
+    mem_allocator _allocator;
+    _allocator.initialize(memory, initial_size, 4096, false);
+
+    unsigned location_to_allocate = 10 * 4096;
+    void *allocation = _allocator.allocate_at(&memory[location_to_allocate], 4096);
+
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - 1) * 4096);
+
+    EXPECT_EQ(allocation, &memory[location_to_allocate]);
+
+    // There should be two free blocks. One of size 4096 * 9 while the other of (1024 - 10) * 4096
+    EXPECT_NE(_allocator.free_blocks, nullptr);
+
+    if (_allocator.free_blocks != nullptr)
+    {
+        EXPECT_EQ(_allocator.free_blocks->size, 4096 * 1013);
+        EXPECT_NE(_allocator.free_blocks->smaller_block, nullptr);
+
+        if (_allocator.free_blocks->smaller_block)
+        {
+            EXPECT_EQ(_allocator.free_blocks->smaller_block->size, 10 * 4096);
+            EXPECT_EQ(_allocator.free_blocks->smaller_block->smaller_block, nullptr);
+            EXPECT_EQ(_allocator.free_blocks->smaller_block->larger_block, nullptr);
+        }
+    }
+}
+
+TEST(MemoryTests, blocks_can_allocate_at_end)
+{
+    unsigned num_blocks = 1024;
+    unsigned initial_size = num_blocks * 4096;
+    unsigned char memory[initial_size];
+
+    for (unsigned i = 0; i < initial_size; i++)
+        memory[i] = 0xff;
+
+    mem_allocator _allocator;
+    _allocator.initialize(memory, initial_size, 4096, false);
+
+    unsigned location_to_allocate = 1023 * 4096;
+    void *allocation = _allocator.allocate_at(&memory[location_to_allocate], 4096);
+
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - 1) * 4096);
+
+    EXPECT_EQ(allocation, &memory[location_to_allocate]);
+
+    // There should be two free blocks. One of size 4096 * 9 while the other of (1024 - 10) * 4096
+    EXPECT_NE(_allocator.free_blocks, nullptr);
+
+    if (_allocator.free_blocks != nullptr)
+    {
+        EXPECT_EQ(_allocator.free_blocks->size, 4096 * 1023);
+        EXPECT_EQ(_allocator.free_blocks->smaller_block, nullptr);
+        EXPECT_EQ(_allocator.free_blocks->larger_block, nullptr);
+    }
+}
+
+TEST(MemoryTests, blocks_can_allocate_at_begining)
+{
+    unsigned num_blocks = 1024;
+    unsigned initial_size = num_blocks * 4096;
+    unsigned char memory[initial_size];
+
+    for (unsigned i = 0; i < initial_size; i++)
+        memory[i] = 0xff;
+
+    mem_allocator _allocator;
+    _allocator.initialize(memory, initial_size, 4096, false);
+
+    unsigned location_to_allocate = 0;
+    void *allocation = _allocator.allocate_at(&memory[location_to_allocate], 4096);
+
+    validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - 1) * 4096);
+
+    EXPECT_EQ(allocation, &memory[location_to_allocate]);
+
+    // There should be two free blocks. One of size 4096 * 9 while the other of (1024 - 10) * 4096
+    EXPECT_NE(_allocator.free_blocks, nullptr);
+
+    if (_allocator.free_blocks != nullptr)
+    {
+        EXPECT_EQ(_allocator.free_blocks->size, 4096 * 1023);
+        EXPECT_EQ(_allocator.free_blocks->smaller_block, nullptr);
+        EXPECT_EQ(_allocator.free_blocks->larger_block, nullptr);
     }
 }
 
@@ -371,8 +468,8 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
     for (unsigned i = 0; i < 4096 * num_blocks; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
     vector<void *> blocks;
@@ -392,15 +489,15 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
             if (blocks_allocated < 16)
             {
                 cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));
+                blocks.push_back(_allocator.allocate(4096));
                 blocks_allocated++;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             else
             {
                 cout << "Allocated block while out of memory..." << endl;
-                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                EXPECT_EQ(_allocator.allocate(4096), nullptr);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             break;
 
@@ -414,9 +511,9 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_1)
                 cout << "Deallocating block " << block_to_deallocate_position << "..." << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
-                _memory_blocks.deallocate(block_to_deallocate);
+                _allocator.deallocate(block_to_deallocate);
                 blocks_allocated--;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
 
             // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.
@@ -434,8 +531,8 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
     for (unsigned i = 0; i < 4096 * num_blocks; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
     vector<void *> blocks;
@@ -455,15 +552,15 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
             if (blocks_allocated < 16)
             {
                 cout << "Allocating block..." << endl;
-                blocks.push_back(_memory_blocks.allocate(4096));
+                blocks.push_back(_allocator.allocate(4096));
                 blocks_allocated++;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             else
             {
                 cout << "Allocated block while out of memory..." << endl;
-                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                EXPECT_EQ(_allocator.allocate(4096), nullptr);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             break;
 
@@ -477,9 +574,9 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_2)
                 cout << "Deallocating block " << block_to_deallocate_position << "..." << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
-                _memory_blocks.deallocate(block_to_deallocate);
+                _allocator.deallocate(block_to_deallocate);
                 blocks_allocated--;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
 
             // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.
@@ -497,8 +594,8 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
     for (unsigned i = 0; i < 4096 * num_blocks; i++)
         memory[i] = static_cast<unsigned char>(0xFF);
 
-    memory_blocks _memory_blocks;
-    _memory_blocks.initialize(reinterpret_cast<void *>(memory), initial_size);
+    mem_allocator _allocator;
+    _allocator.initialize(reinterpret_cast<void *>(memory), initial_size, 4096, false);
     // Tree is one big block.
 
     vector<void *> blocks;
@@ -530,15 +627,15 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
             if (blocks_allocated < 16)
             {
                 cout << "Allocating block...";
-                blocks.push_back(_memory_blocks.allocate(4096));
+                blocks.push_back(_allocator.allocate(4096));
                 blocks_allocated++;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             else
             {
                 cout << "Allocated block while out of memory..." << endl;
-                EXPECT_EQ(_memory_blocks.allocate(4096), nullptr);
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                EXPECT_EQ(_allocator.allocate(4096), nullptr);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
             break;
 
@@ -552,9 +649,9 @@ TEST(MemoryTests, blocks_can_allocate_and_deallocate_failure_scenario_3)
                 cout << "Deallocating block " << block_to_deallocate_position << "..." << endl;
 
                 blocks.erase(find(blocks.begin(), blocks.end(), block_to_deallocate));
-                _memory_blocks.deallocate(block_to_deallocate);
+                _allocator.deallocate(block_to_deallocate);
                 blocks_allocated--;
-                validate_free_blocks(_memory_blocks.free_blocks, _memory_blocks.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
+                validate_free_blocks(_allocator.free_blocks, _allocator.free_blocks_by_address, (num_blocks - blocks_allocated) * 4096);
             }
 
             // Note if we attempt to deallocate what doesn't exist... we should end up with memory corruption.

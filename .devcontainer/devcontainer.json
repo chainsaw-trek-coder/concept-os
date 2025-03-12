@@ -5,7 +5,7 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:jammy",
 	"postCreateCommand": "/workspaces/concept-os/.devcontainer/initialize.sh",
-	"postStartCommand": "/workspaces/concept-os/graphics-env/launch.sh",
+	"postAttachCommand": "/workspaces/concept-os/graphics-env/launch.sh",
 	"containerEnv": {
 		"DEBIAN_FRONTEND": "noninteractive",
 		"LANG": "en_US.UTF-8",
@@ -22,7 +22,13 @@
 				"matepek.vscode-catch2-test-adapter"
 			]
 		}
-	}
+	},
+	// These are needed in order to be able to create bootable drives.
+	"runArgs": [
+        "--privileged",
+        "--cap-add=SYS_ADMIN",
+        "-v", "/dev:/dev"
+    ]
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

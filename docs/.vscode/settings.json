@@ -1,6 +1,6 @@
 {
-    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "/workspaces/concept-os/docs",
+    "cmake.buildDirectory": "${workspaceFolder}/../../build/docs",
     "cmake.ignoreCMakeListsMissing": true,
     "cmake.ignoreKitEnv": true,
-    "C_Cpp.default.compilerPath": ""
 }

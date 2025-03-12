@@ -1,12 +1,15 @@
 *.o
 *.bin
 *.iso
+*.img
 helloworld/isodir/**
 *.log
 *.pid
+Cargo.lock
 
 build/kernel-common/**
 build/kernel-loader/**
 build/kernel/**
 build/common/**
+build/fs_library/**
 build/os.text-mode-driver/**
