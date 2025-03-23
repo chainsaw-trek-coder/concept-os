@@ -6,7 +6,7 @@
     ],
     "C_Cpp.default.compilerPath": "/home/vscode/opt/cross/bin/i686-elf-g++",
     "cmake.sourceDirectory": "/workspaces/concept-os/source/kernel-common",
-    "cmake.buildDirectory": "${workspaceFolder}/../../build/kernel-common",
+    "cmake.buildDirectory": "${workspaceFolder:build}/kernel-common",
     "cmake.configureSettings": {
         "CMAKE_C_COMPILER_WORKS": "1",
         "CMAKE_CXX_COMPILER_WORKS": "1"

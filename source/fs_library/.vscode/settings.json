@@ -1,5 +1,5 @@
 {
     "cmake.sourceDirectory": "/workspaces/concept-os/source/fs_library",
-    "cmake.buildDirectory": "${workspaceFolder}/../../build/fs_library",
+    "cmake.buildDirectory": "${workspaceFolder:build}/fs_library",
     "cmake.ignoreKitEnv": true
 }

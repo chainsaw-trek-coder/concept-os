@@ -4,6 +4,7 @@ sudo apt update -y
 # Disk Utilities
 sudo apt install grub2-common -y
 sudo apt-get install grub-pc-bin -y
+sudo apt-get install xorriso -y
 sudo apt install parted -y
 sudo apt install udev -y
 

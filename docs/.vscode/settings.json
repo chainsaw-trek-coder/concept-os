@@ -1,6 +1,6 @@
 {
     "cmake.sourceDirectory": "/workspaces/concept-os/docs",
-    "cmake.buildDirectory": "${workspaceFolder}/../../build/docs",
+    "cmake.buildDirectory": "${workspaceFolder:build}/docs",
     "cmake.ignoreCMakeListsMissing": true,
     "cmake.ignoreKitEnv": true,
 }
