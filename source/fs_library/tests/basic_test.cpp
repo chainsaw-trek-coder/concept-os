@@ -4,13 +4,32 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
+extern "C" void * alloc_for_rust(u64 size)
+{
+    auto result = malloc(size);
+
+    // Output result for logging
+    printf("Allocated %llu bytes at %p\n", size, result);
+    return result;
+}
+
+extern "C" void dealloc_for_rust(void *ptr)
+{
+    free(ptr);
+}
+
+// Alias rust pointer
+typedef u64 partition_rust_callback;
+
 struct PartitionUnsafe
 {
-    u64 (*get_size)(u64 handle);
-    u64 (*read)(u64 handle, u8 *buffer, u64 offset, u64 size);
-    u64 (*write)(u64 handle, const u8 *buffer, u64 offset, u64 size);
-    u64 (*flush)(u64 handle);
+    void (*get_size_async)(u64 handle, partition_rust_callback callback);
+    void (*read_async)(u64 handle, u8 *buffer, u64 offset, u64 size, partition_rust_callback callback);
+    void (*write_async)(u64 handle, const u8 *buffer, u64 offset, u64 size, partition_rust_callback callback);
+    void (*flush_async)(u64 handle, partition_rust_callback callback);
 };
+
+extern "C" void partition_complete_future(u64 result, partition_rust_callback callback);
 
 class PartitionBase
 {
@@ -21,24 +40,25 @@ public:
     PartitionBase()
     {
         partition = {
-            .get_size = [](u64 handle) -> u64
-            {
-                return reinterpret_cast<PartitionBase *>(handle)->get_size();
+            .get_size_async = [](u64 handle, partition_rust_callback callback) {
+                PartitionBase *partition = reinterpret_cast<PartitionBase *>(handle);
+                u64 size = partition->get_size();
+                partition_complete_future(size, callback);
             },
-            
-            .read = [](u64 handle, u8 *buffer, u64 offset, u64 size) -> u64
-            {
-                return reinterpret_cast<PartitionBase *>(handle)->read(buffer, offset, size);
+            .read_async = [](u64 handle, u8 *buffer, u64 offset, u64 size, partition_rust_callback callback) {
+                PartitionBase *partition = reinterpret_cast<PartitionBase *>(handle);
+                u64 bytes_read = partition->read(buffer, offset, size);
+                partition_complete_future(bytes_read, callback);
             },
-
-            .write = [](u64 handle, const u8 *buffer, u64 offset, u64 size) -> u64
-            {
-                return reinterpret_cast<PartitionBase *>(handle)->write(buffer, offset, size);
+            .write_async = [](u64 handle, const u8 *buffer, u64 offset, u64 size, partition_rust_callback callback) {
+                PartitionBase *partition = reinterpret_cast<PartitionBase *>(handle);
+                u64 bytes_written = partition->write(buffer, offset, size);
+                partition_complete_future(bytes_written, callback);
             },
-
-            .flush = [](u64 handle) -> u64
-            {
-                return reinterpret_cast<PartitionBase *>(handle)->flush();
+            .flush_async = [](u64 handle, partition_rust_callback callback) {
+                PartitionBase *partition = reinterpret_cast<PartitionBase *>(handle);
+                u64 bytes_flushed = partition->flush();
+                partition_complete_future(bytes_flushed, callback);
             }
         };
     }
