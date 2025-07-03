@@ -5,17 +5,13 @@ use core::task::{Context, Poll};
 use alloc::sync::Arc;
 use core::cell::RefCell;
 
+use crate ::io_chunk::IoChunkSafe;
+use crate ::io_chunk::IoChunk;
+
 pub struct PartitionUnsafe {
-    // pub get_size: fn(handle: u64) -> u64,
     pub get_size_async: fn(handle: u64, closure: *const RefCell<dyn FnMut(u64)>),
-
-    // pub read: fn(handle: u64, buffer: *mut u8, offset: u64, size: u64) -> u64,
-    pub read_async: fn(handle: u64, buffer: *mut u8, offset: u64, size: u64, closure: *const RefCell<dyn FnMut(u64)>),
-
-    // pub write: fn(handle: u64, buffer: *const u8, offset: u64, size: u64) -> u64,
-    pub write_async: fn(handle: u64, buffer: *const u8, offset: u64, size: u64, closure: *const RefCell<dyn FnMut(u64)>),
-
-    // pub flush: fn(handle: u64) -> u64,
+    pub read_async: fn(handle: u64, offset: u64, size: u64, closure: *const RefCell<dyn FnMut(IoChunk)>),
+    pub write_async: fn(handle: u64, io_chunk: IoChunk, offset: u64, size: u64, closure: *const RefCell<dyn FnMut(u64)>),
     pub flush_async: fn(handle: u64, closure: *const RefCell<dyn FnMut(u64)>)
 }
 
@@ -35,23 +31,24 @@ impl PartitionUnsafe {
 }
 
 pub struct PartitionSafe {
-    partition: PartitionUnsafe
+    partition: PartitionUnsafe,
+    handle: u64
 }
 
-struct SharedState {
-    result: Option<u64>,
+struct SharedState<TResult> {
+    result: Option<TResult>,
     waker: Option<core::task::Waker>
 }
 
-struct PartitionFuture {
+struct PartitionFuture<TResult> {
     called: bool,
-    shared_state: Arc<RefCell<SharedState>>,
-    on_call: Arc<RefCell<dyn FnMut(Arc<RefCell<dyn FnMut(u64)>>)>>
+    shared_state: Arc<RefCell<SharedState<TResult>>>,
+    on_call: Arc<RefCell<dyn FnMut(Arc<RefCell<dyn FnMut(TResult)>>)>>
 }
 
-impl PartitionFuture {
+impl<TResult> PartitionFuture<TResult> {
 
-    pub fn new(on_call: Arc<RefCell<dyn FnMut(Arc<RefCell<dyn FnMut(u64)>>)>>) -> Self {
+    pub fn new(on_call: Arc<RefCell<dyn FnMut(Arc<RefCell<dyn FnMut(TResult)>>)>>) -> Self {
         PartitionFuture {
             called: false,
             shared_state: Arc::new(RefCell::new(SharedState {
@@ -64,9 +61,11 @@ impl PartitionFuture {
 
 }
 
-impl Future for PartitionFuture {
+impl<TResult> Future for PartitionFuture<TResult> 
+    where TResult: Copy + 'static
+{
 
-    type Output = u64;
+    type Output = TResult;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
 
@@ -79,7 +78,7 @@ impl Future for PartitionFuture {
         if !self.called {
             self.called = true;
 
-            (self.on_call.borrow_mut())(Arc::new(RefCell::new(move |result| {
+            (self.on_call.borrow_mut())(Arc::new(RefCell::new(move |result: TResult| {
                 let mut state = state.borrow_mut();
                 state.result = Some(result);
 
@@ -101,7 +100,7 @@ impl Future for PartitionFuture {
 }
 
 #[unsafe(no_mangle)]
-pub extern fn partition_complete_future(result: u64, closure: *const RefCell<dyn FnMut(u64)>) {
+pub extern fn partition_async_return_u64(result: u64, closure: *const RefCell<dyn FnMut(u64)>) {
     unsafe {
         let closure = Arc::from_raw(closure as *const RefCell<dyn FnMut(u64)>);
         (*closure.borrow_mut())(result);
@@ -109,17 +108,28 @@ pub extern fn partition_complete_future(result: u64, closure: *const RefCell<dyn
     }
 }
 
+#[unsafe(no_mangle)]
+pub extern fn partition_async_return_io_chunk(result: IoChunk, closure: *const RefCell<dyn FnMut(IoChunk)>) {
+    unsafe {
+        let closure = Arc::from_raw(closure as *const RefCell<dyn FnMut(IoChunk)>);
+        (*closure.borrow_mut())(result);
+        drop(closure); 
+    }
+}
+
 impl PartitionSafe {
 
-    pub fn new(partition: *mut PartitionUnsafe) -> Self {
+    pub fn new(partition: *mut PartitionUnsafe, handle: u64) -> Self {
         PartitionSafe {
-            partition: unsafe { (*partition).clone() }
+            partition: unsafe { (*partition).clone() },
+            handle: handle
         }
     }
 
-    pub async fn get_size(&self, handle: u64) -> u64 {
+    pub async fn get_size(&self) -> u64 {
 
         let partition = self.partition.clone();
+        let handle = self.handle;
 
         PartitionFuture::new(
             Arc::new(RefCell::new(move |on_complete: Arc<RefCell<dyn FnMut(u64)>>| {
@@ -128,31 +138,36 @@ impl PartitionSafe {
             }))).await
     }
 
-    pub async fn read(&self, handle: u64, buffer: *mut u8, offset: u64, size: u64) -> u64 {
+    pub async fn read(&self, offset: u64, size: u64) -> Arc<IoChunkSafe> {
 
         let partition = self.partition.clone();
+        let handle = self.handle;
 
-        PartitionFuture::new(
-            Arc::new(RefCell::new(move |on_complete: Arc<RefCell<dyn FnMut(u64)>>| {
-                // Incredibly important that the C++ function calls on_ccomplete
-                (partition.read_async)(handle, buffer, offset, size, Arc::into_raw(on_complete));
-            }))).await
+        let chunk = PartitionFuture::new(
+            Arc::new(RefCell::new(move |on_complete: Arc<RefCell<dyn FnMut(IoChunk)>>| {
+                // Incredibly important that the C++ function calls on_complete
+                (partition.read_async)(handle, offset, size, Arc::into_raw(on_complete));
+            }))).await;
+
+        return Arc::new(IoChunkSafe::from_raw(chunk));
     }
 
-    pub async fn write(&self, handle: u64, buffer: *const u8, offset: u64, size: u64) -> u64 {
+    pub async fn write(&self, io_chunk: IoChunkSafe, offset: u64, size: u64) -> u64 {
 
         let partition = self.partition.clone();
+        let handle = self.handle;
 
         PartitionFuture::new(
             Arc::new(RefCell::new(move |on_complete: Arc<RefCell<dyn FnMut(u64)>>| {
                 // Incredibly important that the C++ function calls on_complete
-                (partition.write_async)(handle, buffer, offset, size, Arc::into_raw(on_complete));
+                (partition.write_async)(handle, io_chunk.chunk, offset, size, Arc::into_raw(on_complete));
             }))).await
     }
 
-    pub async fn flush(&self, handle: u64) -> u64 {
+    pub async fn flush(&self) -> u64 {
 
         let partition = self.partition.clone();
+        let handle = self.handle;
 
         PartitionFuture::new(
             Arc::new(RefCell::new(move |on_complete: Arc<RefCell<dyn FnMut(u64)>>| {
